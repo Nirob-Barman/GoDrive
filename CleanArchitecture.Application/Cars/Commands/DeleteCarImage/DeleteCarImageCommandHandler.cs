@@ -28,17 +28,7 @@ public class DeleteCarImageCommandHandler : IRequestHandler<DeleteCarImageComman
 
         await _imageUploadService.DeleteAsync(image.PublicId, cancellationToken);
 
-        var wasPrimary = image.IsPrimary;
-        _context.CarImages.Remove(image);
-
-        if (wasPrimary)
-        {
-            var nextPrimary = car.Images.FirstOrDefault(i => i.Id != image.Id);
-            if (nextPrimary is not null)
-            {
-                nextPrimary.IsPrimary = true;
-            }
-        }
+        car.RemoveImage(image.Id);
 
         await _context.SaveChangesAsync(cancellationToken);
     }

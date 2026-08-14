@@ -24,14 +24,7 @@ public class IdentityService : IIdentityService
     public async Task<CreateUserResult> CreateUserAsync(
         string fullName, string email, string password, string? phoneNumber, CancellationToken cancellationToken)
     {
-        var user = new ApplicationUser
-        {
-            UserName = email,
-            Email = email,
-            FullName = fullName,
-            PhoneNumber = phoneNumber,
-            IsActive = true
-        };
+        var user = ApplicationUser.Create(email, fullName, phoneNumber);
 
         var result = await _userManager.CreateAsync(user, password);
 
@@ -109,14 +102,9 @@ public class IdentityService : IIdentityService
             return false;
         }
 
-        user.FullName = fullName;
-        user.PhoneNumber = phoneNumber;
-        user.Address = address;
-        user.ProfileImageUrl = profileImageUrl;
-        user.NIDOrPassportNumber = nidOrPassportNumber;
-        user.NIDOrPassportImageUrl = nidOrPassportImageUrl;
-        user.DrivingLicenseNumber = drivingLicenseNumber;
-        user.DrivingLicenseImageUrl = drivingLicenseImageUrl;
+        user.UpdateProfile(
+            fullName, phoneNumber, address, profileImageUrl,
+            nidOrPassportNumber, nidOrPassportImageUrl, drivingLicenseNumber, drivingLicenseImageUrl);
 
         var result = await _userManager.UpdateAsync(user);
 

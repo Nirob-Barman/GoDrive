@@ -1,7 +1,6 @@
 using CleanArchitecture.Application.Cars.Common;
 using CleanArchitecture.Application.Common.Interfaces;
 using CleanArchitecture.Domain.Entities;
-using CleanArchitecture.Domain.Enums;
 using MediatR;
 
 namespace CleanArchitecture.Application.Cars.Commands.CreateCar;
@@ -17,22 +16,18 @@ public class CreateCarCommandHandler : IRequestHandler<CreateCarCommand, CarDeta
 
     public async Task<CarDetailsDto> Handle(CreateCarCommand request, CancellationToken cancellationToken)
     {
-        var car = new Car
-        {
-            Name = request.Name,
-            Brand = request.Brand,
-            Model = request.Model,
-            Year = request.Year,
-            Description = request.Description,
-            CarType = request.CarType,
-            FuelType = request.FuelType,
-            Transmission = request.Transmission,
-            Seats = request.Seats,
-            PricePerHour = request.PricePerHour,
-            Location = request.Location,
-            Status = CarStatus.Active,
-            CreatedAt = DateTime.UtcNow
-        };
+        var car = Car.Create(
+            request.Name,
+            request.Brand,
+            request.Model,
+            request.Year,
+            request.Description,
+            request.CarType,
+            request.FuelType,
+            request.Transmission,
+            request.Seats,
+            request.PricePerHour,
+            request.Location);
 
         _context.Cars.Add(car);
         await _context.SaveChangesAsync(cancellationToken);

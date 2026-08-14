@@ -23,6 +23,12 @@ public class DeleteCarCommandHandler : IRequestHandler<DeleteCarCommand>
             .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken)
             ?? throw new NotFoundException("Car", request.Id);
 
+        var hasReservations = await _context.Reservations.AnyAsync(r => r.CarId == request.Id, cancellationToken);
+        if (hasReservations)
+        {
+            throw new ConflictException("This car has reservation history and cannot be deleted. Deactivate it instead.");
+        }
+
         foreach (var image in car.Images)
         {
             await _imageUploadService.DeleteAsync(image.PublicId, cancellationToken);

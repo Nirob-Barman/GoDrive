@@ -1,7 +1,9 @@
 using System.Text;
 using CleanArchitecture.Application.Common.Interfaces;
+using CleanArchitecture.Infrastructure.Email;
 using CleanArchitecture.Infrastructure.ExternalServices;
 using CleanArchitecture.Infrastructure.Identity;
+using CleanArchitecture.Infrastructure.Outbox;
 using CleanArchitecture.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -53,6 +55,18 @@ public static class DependencyInjection
             options.ApiSecret = configuration["Cloudinary:ApiSecret"] ?? string.Empty;
         });
 
+        services.Configure<EmailSettings>(options =>
+        {
+            options.Enabled = bool.TryParse(configuration["EmailSettings:Enabled"], out var enabled) && enabled;
+            options.SmtpServer = configuration["EmailSettings:SmtpServer"] ?? string.Empty;
+            options.Port = int.TryParse(configuration["EmailSettings:Port"], out var port) ? port : 587;
+            options.SenderEmail = configuration["EmailSettings:SenderEmail"] ?? string.Empty;
+            options.SenderName = configuration["EmailSettings:SenderName"] ?? string.Empty;
+            options.Username = configuration["EmailSettings:Username"] ?? string.Empty;
+            options.Password = configuration["EmailSettings:Password"] ?? string.Empty;
+            options.EnableSsl = !bool.TryParse(configuration["EmailSettings:EnableSsl"], out var enableSslParsed) || enableSslParsed;
+        });
+
         services
             .AddAuthentication(options =>
             {
@@ -77,6 +91,8 @@ public static class DependencyInjection
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IImageUploadService, CloudinaryImageUploadService>();
+        services.AddScoped<IEmailService, MailKitEmailService>();
+        services.AddHostedService<OutboxProcessor>();
 
         return services;
     }

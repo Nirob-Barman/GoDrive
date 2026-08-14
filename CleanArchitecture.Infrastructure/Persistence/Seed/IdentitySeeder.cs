@@ -38,14 +38,8 @@ public static class IdentitySeeder
             return;
         }
 
-        var admin = new ApplicationUser
-        {
-            UserName = adminEmail,
-            Email = adminEmail,
-            FullName = configuration["SeedAdmin:FullName"] ?? "GoDrive Admin",
-            EmailConfirmed = true,
-            IsActive = true
-        };
+        var admin = ApplicationUser.Create(adminEmail, configuration["SeedAdmin:FullName"] ?? "GoDrive Admin", null);
+        admin.EmailConfirmed = true;
 
         var result = await userManager.CreateAsync(admin, adminPassword);
 

@@ -22,19 +22,19 @@ public class UpdateCarCommandHandler : IRequestHandler<UpdateCarCommand, CarDeta
             .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken)
             ?? throw new NotFoundException("Car", request.Id);
 
-        car.Name = request.Name;
-        car.Brand = request.Brand;
-        car.Model = request.Model;
-        car.Year = request.Year;
-        car.Description = request.Description;
-        car.CarType = request.CarType;
-        car.FuelType = request.FuelType;
-        car.Transmission = request.Transmission;
-        car.Seats = request.Seats;
-        car.PricePerHour = request.PricePerHour;
-        car.Location = request.Location;
-        car.Status = request.Status;
-        car.UpdatedAt = DateTime.UtcNow;
+        car.UpdateDetails(
+            request.Name,
+            request.Brand,
+            request.Model,
+            request.Year,
+            request.Description,
+            request.CarType,
+            request.FuelType,
+            request.Transmission,
+            request.Seats,
+            request.PricePerHour,
+            request.Location,
+            request.Status);
 
         await _context.SaveChangesAsync(cancellationToken);
 

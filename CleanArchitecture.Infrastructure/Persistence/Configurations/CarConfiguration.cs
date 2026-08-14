@@ -25,6 +25,9 @@ public class CarConfiguration : IEntityTypeConfiguration<Car>
             .HasForeignKey(i => i.CarId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        // Images is a read-only collection backed by a private field - point EF at the field directly.
+        builder.Navigation(c => c.Images).UsePropertyAccessMode(PropertyAccessMode.Field);
+
         builder.HasIndex(c => c.CarType);
         builder.HasIndex(c => c.Status);
         builder.HasIndex(c => c.PricePerHour);

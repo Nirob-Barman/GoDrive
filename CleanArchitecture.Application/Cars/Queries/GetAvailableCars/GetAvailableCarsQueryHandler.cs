@@ -7,11 +7,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CleanArchitecture.Application.Cars.Queries.GetAvailableCars;
 
-// NOTE: overlap-exclusion against active reservations lands in Phase 4 once the Reservation
-// entity exists. For now this returns all Active cars matching the filters (dates are
-// validated but not yet used to exclude overlapping bookings).
 public class GetAvailableCarsQueryHandler : IRequestHandler<GetAvailableCarsQuery, PaginatedList<CarListItemDto>>
 {
+    private static readonly ReservationStatus[] BlockingStatuses =
+    {
+        ReservationStatus.Pending, ReservationStatus.Approved, ReservationStatus.PickedUp
+    };
+
     private readonly IApplicationDbContext _context;
 
     public GetAvailableCarsQueryHandler(IApplicationDbContext context)
@@ -21,9 +23,15 @@ public class GetAvailableCarsQueryHandler : IRequestHandler<GetAvailableCarsQuer
 
     public async Task<PaginatedList<CarListItemDto>> Handle(GetAvailableCarsQuery request, CancellationToken cancellationToken)
     {
+        var overlappingCarIds = _context.Reservations
+            .Where(r => BlockingStatuses.Contains(r.Status)
+                && r.PickupDate < request.DropoffDate
+                && request.PickupDate < r.DropoffDate)
+            .Select(r => r.CarId);
+
         var query = _context.Cars
             .Include(c => c.Images)
-            .Where(c => c.Status == CarStatus.Active)
+            .Where(c => c.Status == CarStatus.Active && !overlappingCarIds.Contains(c.Id))
             .AsQueryable();
 
         query = CarQueryFilters.Apply(

@@ -58,6 +58,16 @@ public class GlobalExceptionHandler : IExceptionHandler
                 conflictEx.Message,
                 Array.Empty<string>()),
 
+            InvalidOperationException invalidOpEx => (
+                StatusCodes.Status409Conflict,
+                invalidOpEx.Message,
+                Array.Empty<string>()),
+
+            IncompleteProfileException incompleteProfileEx => (
+                StatusCodes.Status422UnprocessableEntity,
+                incompleteProfileEx.Message,
+                Array.Empty<string>()),
+
             UnauthorizedAccessException => (
                 StatusCodes.Status401Unauthorized,
                 "Unauthorized",
