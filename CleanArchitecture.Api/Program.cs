@@ -1,3 +1,7 @@
+// Load .env (searching this and parent directories) before configuration is built,
+// so its values are already process environment variables when AddEnvironmentVariables() runs.
+DotNetEnv.Env.TraversePath().Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

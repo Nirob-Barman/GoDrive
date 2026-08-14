@@ -28,6 +28,11 @@ secrets.json
 *.pfx
 *.p12
 
+## Environment secrets (never commit) — .env.example stays tracked
+.env
+.env.*
+!.env.example
+
 ## Uploaded files (runtime-generated)
 **/wwwroot/uploads/
 
