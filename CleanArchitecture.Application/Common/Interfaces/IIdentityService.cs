@@ -1,0 +1,31 @@
+using CleanArchitecture.Application.Common.Models;
+
+namespace CleanArchitecture.Application.Common.Interfaces;
+
+public interface IIdentityService
+{
+    Task<bool> IsEmailInUseAsync(string email, CancellationToken cancellationToken);
+
+    Task<CreateUserResult> CreateUserAsync(
+        string fullName,
+        string email,
+        string password,
+        string? phoneNumber,
+        CancellationToken cancellationToken);
+
+    Task<AuthenticateResult> AuthenticateAsync(string email, string password, CancellationToken cancellationToken);
+
+    Task<UserProfileResult?> GetProfileAsync(string userId, CancellationToken cancellationToken);
+
+    Task<bool> UpdateProfileAsync(
+        string userId,
+        string fullName,
+        string? phoneNumber,
+        string? address,
+        string? profileImageUrl,
+        string? nidOrPassportNumber,
+        string? nidOrPassportImageUrl,
+        string? drivingLicenseNumber,
+        string? drivingLicenseImageUrl,
+        CancellationToken cancellationToken);
+}

@@ -1,4 +1,6 @@
 using CleanArchitecture.Api.Middleware;
+using CleanArchitecture.Api.Services;
+using CleanArchitecture.Application.Common.Interfaces;
 using Microsoft.OpenApi.Models;
 
 namespace CleanArchitecture.Api;
@@ -9,6 +11,10 @@ public static class DependencyInjection
     {
         services.AddControllers();
         services.AddEndpointsApiExplorer();
+
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddAuthorization();
 
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
