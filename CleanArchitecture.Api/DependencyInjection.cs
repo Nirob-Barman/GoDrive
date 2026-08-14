@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using CleanArchitecture.Api.Middleware;
 using CleanArchitecture.Api.Services;
 using CleanArchitecture.Application.Common.Interfaces;
@@ -9,7 +10,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApiServices(this IServiceCollection services)
     {
-        services.AddControllers();
+        services.AddControllers()
+            .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
         services.AddEndpointsApiExplorer();
 
         services.AddHttpContextAccessor();

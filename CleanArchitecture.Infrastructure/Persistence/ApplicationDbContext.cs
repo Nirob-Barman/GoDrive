@@ -1,4 +1,5 @@
 using CleanArchitecture.Application.Common.Interfaces;
+using CleanArchitecture.Domain.Entities;
 using CleanArchitecture.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
         : base(options)
     {
     }
+
+    public DbSet<Car> Cars => Set<Car>();
+    public DbSet<CarImage> CarImages => Set<CarImage>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
