@@ -28,4 +28,12 @@ public interface IIdentityService
         string? drivingLicenseNumber,
         string? drivingLicenseImageUrl,
         CancellationToken cancellationToken);
+
+    Task<ChangePasswordResult> ChangePasswordAsync(
+        string userId, string currentPassword, string newPassword, CancellationToken cancellationToken);
+
+    Task<PasswordResetTokenResult?> GeneratePasswordResetTokenAsync(string email, CancellationToken cancellationToken);
+
+    Task<ResetPasswordResult> ResetPasswordAsync(
+        string email, string token, string newPassword, CancellationToken cancellationToken);
 }

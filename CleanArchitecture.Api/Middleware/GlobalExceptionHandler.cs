@@ -68,6 +68,11 @@ public class GlobalExceptionHandler : IExceptionHandler
                 incompleteProfileEx.Message,
                 Array.Empty<string>()),
 
+            IdentityOperationException identityOpEx => (
+                StatusCodes.Status400BadRequest,
+                "Identity operation failed",
+                identityOpEx.Errors),
+
             UnauthorizedAccessException => (
                 StatusCodes.Status401Unauthorized,
                 "Unauthorized",

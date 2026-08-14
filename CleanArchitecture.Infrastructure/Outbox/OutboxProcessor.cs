@@ -116,6 +116,21 @@ public class OutboxProcessor : BackgroundService
                 break;
             }
 
+            case OutboxMessageTypes.PasswordResetEmail:
+            {
+                var payload = JsonSerializer.Deserialize<PasswordResetEmailPayload>(message.Payload)
+                    ?? throw new InvalidOperationException("Invalid PasswordResetEmail payload.");
+
+                var body =
+                    $"<p>Hi {payload.FullName},</p>" +
+                    $"<p>Use this code to reset your GoDrive password:</p>" +
+                    $"<p style=\"font-family:monospace;font-size:14px\">{payload.Token}</p>" +
+                    $"<p>Submit it along with your email and new password to the reset-password endpoint. If you didn't request this, ignore this email.</p>";
+
+                await emailService.SendAsync(payload.Email, "Reset your GoDrive password", body, cancellationToken);
+                break;
+            }
+
             default:
                 throw new InvalidOperationException($"Unknown outbox message type '{message.Type}'.");
         }

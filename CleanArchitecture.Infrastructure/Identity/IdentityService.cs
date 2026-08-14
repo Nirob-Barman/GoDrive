@@ -42,10 +42,23 @@ public class IdentityService : IIdentityService
     {
         var user = await _userManager.FindByEmailAsync(email);
 
-        if (user is null || !await _userManager.CheckPasswordAsync(user, password))
+        if (user is null)
         {
             return new AuthenticateResult(false, null, null, null, null, "Invalid email or password.");
         }
+
+        if (await _userManager.IsLockedOutAsync(user))
+        {
+            return new AuthenticateResult(false, null, null, null, null, "Account locked due to repeated failed login attempts. Try again later.");
+        }
+
+        if (!await _userManager.CheckPasswordAsync(user, password))
+        {
+            await _userManager.AccessFailedAsync(user);
+            return new AuthenticateResult(false, null, null, null, null, "Invalid email or password.");
+        }
+
+        await _userManager.ResetAccessFailedCountAsync(user);
 
         if (!user.IsActive)
         {
@@ -109,5 +122,49 @@ public class IdentityService : IIdentityService
         var result = await _userManager.UpdateAsync(user);
 
         return result.Succeeded;
+    }
+
+    public async Task<ChangePasswordResult> ChangePasswordAsync(
+        string userId, string currentPassword, string newPassword, CancellationToken cancellationToken)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+
+        if (user is null)
+        {
+            return new ChangePasswordResult(false, new[] { "User not found." });
+        }
+
+        var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+
+        return new ChangePasswordResult(result.Succeeded, result.Errors.Select(e => e.Description).ToArray());
+    }
+
+    public async Task<PasswordResetTokenResult?> GeneratePasswordResetTokenAsync(string email, CancellationToken cancellationToken)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+
+        if (user is null)
+        {
+            return null;
+        }
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+        return new PasswordResetTokenResult(token, user.Email ?? email, user.FullName);
+    }
+
+    public async Task<ResetPasswordResult> ResetPasswordAsync(
+        string email, string token, string newPassword, CancellationToken cancellationToken)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+
+        if (user is null)
+        {
+            return new ResetPasswordResult(false, null, new[] { "Invalid token." });
+        }
+
+        var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+
+        return new ResetPasswordResult(result.Succeeded, user.Id, result.Errors.Select(e => e.Description).ToArray());
     }
 }
