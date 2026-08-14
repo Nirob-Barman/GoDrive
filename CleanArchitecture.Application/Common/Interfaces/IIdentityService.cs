@@ -36,4 +36,11 @@ public interface IIdentityService
 
     Task<ResetPasswordResult> ResetPasswordAsync(
         string email, string token, string newPassword, CancellationToken cancellationToken);
+
+    Task<PaginatedList<UserSummaryResult>> GetUsersAsync(
+        string? search, bool? isActive, int pageNumber, int pageSize, CancellationToken cancellationToken);
+
+    Task<bool> SetUserActiveStatusAsync(string userId, bool isActive, CancellationToken cancellationToken);
+
+    Task<bool> ChangeUserRoleAsync(string userId, string newRole, CancellationToken cancellationToken);
 }
