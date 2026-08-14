@@ -35,6 +35,7 @@ public static class DependencyInjection
         var jwtIssuer = configuration["Jwt:Issuer"] ?? string.Empty;
         var jwtAudience = configuration["Jwt:Audience"] ?? string.Empty;
         var jwtExpirationMinutes = int.TryParse(configuration["Jwt:ExpirationMinutes"], out var minutes) ? minutes : 60;
+        var refreshTokenExpirationDays = int.TryParse(configuration["Jwt:RefreshTokenExpirationDays"], out var days) ? days : 7;
 
         services.Configure<JwtSettings>(options =>
         {
@@ -42,6 +43,7 @@ public static class DependencyInjection
             options.Issuer = jwtIssuer;
             options.Audience = jwtAudience;
             options.ExpirationMinutes = jwtExpirationMinutes;
+            options.RefreshTokenExpirationDays = refreshTokenExpirationDays;
         });
 
         services.Configure<CloudinaryOptions>(options =>

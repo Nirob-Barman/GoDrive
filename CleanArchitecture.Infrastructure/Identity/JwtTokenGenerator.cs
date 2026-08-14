@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using CleanArchitecture.Application.Common.Interfaces;
 using Microsoft.Extensions.Options;
@@ -16,7 +17,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         _jwtSettings = jwtSettings.Value;
     }
 
-    public (string Token, DateTime ExpiresAtUtc) GenerateToken(string userId, string email, string role)
+    public (string Token, DateTime ExpiresAtUtc) GenerateAccessToken(string userId, string email, string role)
     {
         var expiresAtUtc = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationMinutes);
 
@@ -41,5 +42,17 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             signingCredentials: credentials);
 
         return (new JwtSecurityTokenHandler().WriteToken(token), expiresAtUtc);
+    }
+
+    public (string Token, DateTime ExpiresAtUtc) GenerateRefreshToken()
+    {
+        var randomBytes = new byte[64];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomBytes);
+
+        var token = Convert.ToBase64String(randomBytes);
+        var expiresAtUtc = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationDays);
+
+        return (token, expiresAtUtc);
     }
 }
