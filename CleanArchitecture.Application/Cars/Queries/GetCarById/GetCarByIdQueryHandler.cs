@@ -22,6 +22,8 @@ public class GetCarByIdQueryHandler : IRequestHandler<GetCarByIdQuery, CarDetail
             .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken)
             ?? throw new NotFoundException("Car", request.Id);
 
-        return CarMapper.ToDetailsDto(car);
+        var (averageRating, reviewCount) = await CarReviewStatsHelper.GetStatsAsync(_context, car.Id, cancellationToken);
+
+        return CarMapper.ToDetailsDto(car, averageRating, reviewCount);
     }
 }

@@ -43,4 +43,6 @@ public interface IIdentityService
     Task<bool> SetUserActiveStatusAsync(string userId, bool isActive, CancellationToken cancellationToken);
 
     Task<bool> ChangeUserRoleAsync(string userId, string newRole, CancellationToken cancellationToken);
+
+    Task<IReadOnlyDictionary<string, string>> GetFullNamesAsync(IEnumerable<string> userIds, CancellationToken cancellationToken);
 }

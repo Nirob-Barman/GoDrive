@@ -4,7 +4,7 @@ namespace CleanArchitecture.Application.Cars.Common;
 
 public static class CarMapper
 {
-    public static CarDetailsDto ToDetailsDto(Car car) => new(
+    public static CarDetailsDto ToDetailsDto(Car car, decimal? averageRating, int reviewCount) => new(
         car.Id,
         car.Name,
         car.Brand,
@@ -20,7 +20,9 @@ public static class CarMapper
         car.Status.ToString(),
         car.CreatedAtUtc,
         car.UpdatedAtUtc,
-        car.Images.Select(i => new CarImageDto(i.Id, i.Url, i.IsPrimary)).ToArray());
+        car.Images.Select(i => new CarImageDto(i.Id, i.Url, i.IsPrimary)).ToArray(),
+        averageRating,
+        reviewCount);
 
     public static CarListItemDto ToListItemDto(Car car) => new(
         car.Id,

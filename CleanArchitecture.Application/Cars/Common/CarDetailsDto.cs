@@ -16,4 +16,6 @@ public record CarDetailsDto(
     string Status,
     DateTime CreatedAt,
     DateTime? UpdatedAt,
-    IReadOnlyCollection<CarImageDto> Images);
+    IReadOnlyCollection<CarImageDto> Images,
+    decimal? AverageRating,
+    int ReviewCount);

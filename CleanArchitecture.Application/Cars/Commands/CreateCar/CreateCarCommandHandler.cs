@@ -32,6 +32,6 @@ public class CreateCarCommandHandler : IRequestHandler<CreateCarCommand, CarDeta
         _context.Cars.Add(car);
         await _context.SaveChangesAsync(cancellationToken);
 
-        return CarMapper.ToDetailsDto(car);
+        return CarMapper.ToDetailsDto(car, averageRating: null, reviewCount: 0);
     }
 }

@@ -38,6 +38,8 @@ public class UpdateCarCommandHandler : IRequestHandler<UpdateCarCommand, CarDeta
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        return CarMapper.ToDetailsDto(car);
+        var (averageRating, reviewCount) = await CarReviewStatsHelper.GetStatsAsync(_context, car.Id, cancellationToken);
+
+        return CarMapper.ToDetailsDto(car, averageRating, reviewCount);
     }
 }

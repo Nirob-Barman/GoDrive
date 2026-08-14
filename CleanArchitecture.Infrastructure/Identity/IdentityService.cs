@@ -241,4 +241,17 @@ public class IdentityService : IIdentityService
 
         return true;
     }
+
+    public async Task<IReadOnlyDictionary<string, string>> GetFullNamesAsync(
+        IEnumerable<string> userIds, CancellationToken cancellationToken)
+    {
+        var ids = userIds.Distinct().ToArray();
+
+        var users = await _userManager.Users
+            .Where(u => ids.Contains(u.Id))
+            .Select(u => new { u.Id, u.FullName })
+            .ToListAsync(cancellationToken);
+
+        return users.ToDictionary(u => u.Id, u => u.FullName);
+    }
 }
