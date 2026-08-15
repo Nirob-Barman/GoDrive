@@ -1,5 +1,6 @@
 using CleanArchitecture.Api.Common;
 using CleanArchitecture.Application.Common.Constants;
+using CleanArchitecture.Application.Dashboard.Queries.GetCarUtilization;
 using CleanArchitecture.Application.Dashboard.Queries.GetDashboardStatistics;
 using CleanArchitecture.Application.Dashboard.Queries.GetRevenueByPeriod;
 using MediatR;
@@ -29,6 +30,13 @@ public class AdminDashboardController : ControllerBase
 
     [HttpGet("revenue")]
     public async Task<IActionResult> GetRevenueByPeriod([FromQuery] GetRevenueByPeriodQuery query, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(query, cancellationToken);
+        return Ok(ApiResponse.Ok(result));
+    }
+
+    [HttpGet("car-utilization")]
+    public async Task<IActionResult> GetCarUtilization([FromQuery] GetCarUtilizationQuery query, CancellationToken cancellationToken)
     {
         var result = await _sender.Send(query, cancellationToken);
         return Ok(ApiResponse.Ok(result));

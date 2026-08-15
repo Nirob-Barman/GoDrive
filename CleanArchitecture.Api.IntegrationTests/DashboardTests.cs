@@ -77,4 +77,79 @@ public class DashboardTests : IntegrationTestBase
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
+
+    [Fact]
+    public async Task Car_utilization_reflects_an_approved_reservations_hours_and_zero_for_an_unused_car()
+    {
+        var adminClient = AuthorizedClient(await LoginAsAdminAsync());
+        var customerClient = AuthorizedClient(await RegisterAndLoginAsync("utilcustomer@test.com"));
+
+        await customerClient.PutAsync(
+            "/api/users/me",
+            new MultipartFormDataContent
+            {
+                { new StringContent("Utilization Customer"), "fullName" },
+                { new StringContent("NID888"), "nIDOrPassportNumber" },
+                { new StringContent("DL888"), "drivingLicenseNumber" }
+            });
+
+        var usedCarResponse = await adminClient.PostAsJsonAsync("/api/admin/cars", new
+        {
+            name = "Used Car",
+            brand = "Toyota",
+            model = "Corolla",
+            year = 2023,
+            description = "A car",
+            carType = "Sedan",
+            fuelType = "Petrol",
+            transmission = "Automatic",
+            seats = 5,
+            pricePerHour = 10m,
+            location = "Dhaka"
+        });
+        var usedCarId = (await ReadDataAsync<JsonElement>(usedCarResponse)).GetProperty("id").GetInt32();
+
+        var idleCarResponse = await adminClient.PostAsJsonAsync("/api/admin/cars", new
+        {
+            name = "Idle Car",
+            brand = "Toyota",
+            model = "Corolla",
+            year = 2023,
+            description = "A car",
+            carType = "Sedan",
+            fuelType = "Petrol",
+            transmission = "Automatic",
+            seats = 5,
+            pricePerHour = 10m,
+            location = "Dhaka"
+        });
+        var idleCarId = (await ReadDataAsync<JsonElement>(idleCarResponse)).GetProperty("id").GetInt32();
+
+        var pickup = DateTime.UtcNow.AddHours(1);
+        var dropoff = pickup.AddHours(10);
+        var reservationResponse = await customerClient.PostAsJsonAsync("/api/reservations", new
+        {
+            carId = usedCarId,
+            pickupDate = pickup,
+            dropoffDate = dropoff
+        });
+        var reservationId = (await ReadDataAsync<JsonElement>(reservationResponse)).GetProperty("id").GetInt32();
+        await adminClient.PutAsync($"/api/admin/reservations/{reservationId}/approve", null);
+
+        var response = await adminClient.GetAsync(
+            $"/api/admin/dashboard/car-utilization?startDate={DateTime.UtcNow.AddDays(-1):O}&endDate={DateTime.UtcNow.AddDays(2):O}");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var items = (await ReadDataAsync<JsonElement>(response)).EnumerateArray().ToList();
+
+        var usedCarStats = items.Single(i => i.GetProperty("carId").GetInt32() == usedCarId);
+        usedCarStats.GetProperty("confirmedBookings").GetInt32().Should().Be(1);
+        usedCarStats.GetProperty("bookedHours").GetInt32().Should().Be(10);
+        usedCarStats.GetProperty("utilizationRatePercent").GetDecimal().Should().BeGreaterThan(0);
+
+        var idleCarStats = items.Single(i => i.GetProperty("carId").GetInt32() == idleCarId);
+        idleCarStats.GetProperty("confirmedBookings").GetInt32().Should().Be(0);
+        idleCarStats.GetProperty("bookedHours").GetInt32().Should().Be(0);
+        idleCarStats.GetProperty("utilizationRatePercent").GetDecimal().Should().Be(0);
+    }
 }
