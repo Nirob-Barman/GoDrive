@@ -22,6 +22,7 @@ export default function Navbar() {
       </Link>
 
       <div className="navbar-links">
+        <Link to="/cars">Cars</Link>
         {user ? (
           <>
             {user.role === "Admin" && <Link to="/admin">Admin</Link>}
