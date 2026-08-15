@@ -2,6 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { useGetCarByIdQuery } from "../../redux/features/cars/carsApi";
 import { useAppSelector } from "../../redux/hooks";
 import { selectCurrentUser } from "../../redux/features/auth/authSlice";
+import CarReviews from "../../components/CarReviews";
 
 export default function CarDetails() {
   const { id } = useParams<{ id: string }>();
@@ -80,6 +81,8 @@ export default function CarDetails() {
           Book Now
         </Link>
       )}
+
+      <CarReviews carId={car.id} />
     </div>
   );
 }

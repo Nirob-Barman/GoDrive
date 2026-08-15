@@ -362,3 +362,58 @@ button[disabled] {
   gap: 4px;
   font-size: 14px;
 }
+
+.car-reviews {
+  margin-top: 32px;
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+}
+
+.car-reviews h2 {
+  margin-bottom: 12px;
+}
+
+.review-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.review-item {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.review-meta {
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 400px;
+  margin-top: 12px;
+}
+
+.review-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.review-form select,
+.review-form textarea {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+}
