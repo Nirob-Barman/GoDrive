@@ -73,6 +73,11 @@ public class GlobalExceptionHandler : IExceptionHandler
                 "Identity operation failed",
                 identityOpEx.Errors),
 
+            InvalidWebhookSignatureException invalidSignatureEx => (
+                StatusCodes.Status400BadRequest,
+                invalidSignatureEx.Message,
+                Array.Empty<string>()),
+
             UnauthorizedAccessException => (
                 StatusCodes.Status401Unauthorized,
                 "Unauthorized",

@@ -4,6 +4,7 @@ using CleanArchitecture.Infrastructure.Email;
 using CleanArchitecture.Infrastructure.ExternalServices;
 using CleanArchitecture.Infrastructure.Identity;
 using CleanArchitecture.Infrastructure.Outbox;
+using CleanArchitecture.Infrastructure.Payments;
 using CleanArchitecture.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -70,6 +71,25 @@ public static class DependencyInjection
             options.EnableSsl = !bool.TryParse(configuration["EmailSettings:EnableSsl"], out var enableSslParsed) || enableSslParsed;
         });
 
+        services.Configure<StripeOptions>(options =>
+        {
+            options.PublishableKey = configuration["Stripe:PublishableKey"] ?? string.Empty;
+            options.SecretKey = configuration["Stripe:SecretKey"] ?? string.Empty;
+            options.WebhookSecret = configuration["Stripe:WebhookSecret"] ?? string.Empty;
+
+            var successUrl = configuration["Stripe:SuccessUrl"];
+            if (!string.IsNullOrWhiteSpace(successUrl))
+            {
+                options.SuccessUrl = successUrl;
+            }
+
+            var cancelUrl = configuration["Stripe:CancelUrl"];
+            if (!string.IsNullOrWhiteSpace(cancelUrl))
+            {
+                options.CancelUrl = cancelUrl;
+            }
+        });
+
         services
             .AddAuthentication(options =>
             {
@@ -95,6 +115,7 @@ public static class DependencyInjection
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IImageUploadService, CloudinaryImageUploadService>();
         services.AddScoped<IEmailService, MailKitEmailService>();
+        services.AddScoped<IPaymentService, StripePaymentService>();
         services.AddHostedService<OutboxProcessor>();
 
         return services;
