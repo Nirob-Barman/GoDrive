@@ -46,3 +46,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// Exposes the top-level statements' auto-generated Program class to CleanArchitecture.Api.IntegrationTests,
+// which needs it as WebApplicationFactory<Program>'s type argument.
+public partial class Program;
