@@ -95,4 +95,51 @@ public class CarsTests : IntegrationTestBase
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
+
+    [Fact]
+    public async Task Non_admin_cannot_list_all_cars()
+    {
+        var userToken = await RegisterAndLoginAsync("adminlistcustomer@test.com");
+        var userClient = AuthorizedClient(userToken);
+
+        var response = await userClient.GetAsync("/api/admin/cars");
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task Admin_car_listing_includes_inactive_cars_unlike_the_public_listing()
+    {
+        var adminClient = AuthorizedClient(await LoginAsAdminAsync());
+
+        var createResponse = await adminClient.PostAsJsonAsync("/api/admin/cars", NewCarPayload("InactiveTestCar"));
+        var carId = (await ReadDataAsync<JsonElement>(createResponse)).GetProperty("id").GetInt32();
+
+        await adminClient.PutAsJsonAsync($"/api/admin/cars/{carId}", new
+        {
+            name = "InactiveTestCar",
+            brand = "Toyota",
+            model = "Corolla",
+            year = 2023,
+            description = "A car",
+            carType = "Sedan",
+            fuelType = "Petrol",
+            transmission = "Automatic",
+            seats = 5,
+            pricePerHour = 10m,
+            location = "Dhaka",
+            status = "Inactive"
+        });
+
+        var publicResponse = await Client.GetAsync("/api/cars?search=InactiveTestCar");
+        var publicResult = await ReadDataAsync<JsonElement>(publicResponse);
+        publicResult.GetProperty("items").EnumerateArray().Should().BeEmpty();
+
+        var adminResponse = await adminClient.GetAsync("/api/admin/cars?search=InactiveTestCar");
+        adminResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var adminResult = await ReadDataAsync<JsonElement>(adminResponse);
+        var items = adminResult.GetProperty("items").EnumerateArray().ToList();
+        items.Should().ContainSingle();
+        items[0].GetProperty("status").GetString().Should().Be("Inactive");
+    }
 }

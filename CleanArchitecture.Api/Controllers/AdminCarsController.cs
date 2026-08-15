@@ -5,6 +5,7 @@ using CleanArchitecture.Application.Cars.Commands.CreateCar;
 using CleanArchitecture.Application.Cars.Commands.DeleteCar;
 using CleanArchitecture.Application.Cars.Commands.DeleteCarImage;
 using CleanArchitecture.Application.Cars.Commands.UpdateCar;
+using CleanArchitecture.Application.Cars.Queries.GetAllCars;
 using CleanArchitecture.Application.Common.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -22,6 +23,13 @@ public class AdminCarsController : ControllerBase
     public AdminCarsController(ISender sender)
     {
         _sender = sender;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAllCars([FromQuery] GetAllCarsQuery query, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(query, cancellationToken);
+        return Ok(ApiResponse.Ok(result));
     }
 
     [HttpPost]
