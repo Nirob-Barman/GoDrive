@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using CleanArchitecture.Api.Common;
 using CleanArchitecture.Api.Middleware;
 using CleanArchitecture.Api.Services;
 using CleanArchitecture.Application.Common.Interfaces;
@@ -17,6 +18,12 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddAuthorization();
+
+        // Vite's default dev server port - the React client (GoDrive.Client) is the only browser caller.
+        services.AddCors(options => options.AddPolicy(CorsPolicies.WebClient, policy => policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod()));
 
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();

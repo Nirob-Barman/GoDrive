@@ -1,4 +1,5 @@
 using CleanArchitecture.Api;
+using CleanArchitecture.Api.Common;
 using CleanArchitecture.Application;
 using CleanArchitecture.Infrastructure;
 using CleanArchitecture.Infrastructure.Persistence.Seed;
@@ -39,6 +40,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(CorsPolicies.WebClient);
 
 app.UseAuthentication();
 app.UseAuthorization();
