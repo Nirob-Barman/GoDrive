@@ -6,10 +6,18 @@ export default function AdminHome() {
       <h1>Admin</h1>
       <ul>
         <li>
+          <Link to="/admin/dashboard">Dashboard</Link>
+        </li>
+        <li>
           <Link to="/admin/reservations">Manage Reservations</Link>
         </li>
+        <li>
+          <Link to="/admin/cars">Manage Cars</Link>
+        </li>
+        <li>
+          <Link to="/admin/users">Manage Users</Link>
+        </li>
       </ul>
-      <p>Car, user, and dashboard management land here in a later phase.</p>
     </div>
   );
 }

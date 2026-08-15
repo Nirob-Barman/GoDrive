@@ -67,3 +67,28 @@ export type TAvailableCarFilters = TCarFilters & {
   pickupDate: string;
   dropoffDate: string;
 };
+
+// Mirrors CleanArchitecture.Application.Cars.Commands.CreateCar.CreateCarCommand
+export type TCreateCarRequest = {
+  name: string;
+  brand: string;
+  model: string;
+  year: number;
+  description?: string;
+  carType: TCarType;
+  fuelType: TFuelType;
+  transmission: TTransmissionType;
+  seats: number;
+  pricePerHour: number;
+  location: string;
+};
+
+// Mirrors CleanArchitecture.Api.Controllers.Requests.UpdateCarRequest
+export type TUpdateCarRequest = TCreateCarRequest & {
+  status: TCarStatus;
+};
+
+// Mirrors CleanArchitecture.Application.Cars.Queries.GetAllCars.GetAllCarsQuery
+export type TAdminCarFilters = TCarFilters & {
+  status?: TCarStatus;
+};

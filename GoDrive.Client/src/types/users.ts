@@ -32,3 +32,11 @@ export type TUserSummary = {
   isActive: boolean;
   role: TRole;
 };
+
+// Mirrors CleanArchitecture.Application.Users.Queries.GetUsers.GetUsersQuery
+export type TUserFilters = {
+  search?: string;
+  isActive?: boolean;
+  pageNumber?: number;
+  pageSize?: number;
+};

@@ -16,6 +16,10 @@ import PaymentReturn from "../pages/user/PaymentReturn";
 import PaymentCancelled from "../pages/user/PaymentCancelled";
 import AdminHome from "../pages/admin/AdminHome";
 import ManageReservations from "../pages/admin/ManageReservations";
+import ManageCars from "../pages/admin/ManageCars";
+import CarForm from "../pages/admin/CarForm";
+import ManageUsers from "../pages/admin/ManageUsers";
+import AdminDashboard from "../pages/admin/AdminDashboard";
 
 export const router = createBrowserRouter([
   {
@@ -42,7 +46,12 @@ export const router = createBrowserRouter([
         element: <AdminRoute />,
         children: [
           { path: "admin", element: <AdminHome /> },
+          { path: "admin/dashboard", element: <AdminDashboard /> },
           { path: "admin/reservations", element: <ManageReservations /> },
+          { path: "admin/cars", element: <ManageCars /> },
+          { path: "admin/cars/new", element: <CarForm /> },
+          { path: "admin/cars/:id/edit", element: <CarForm /> },
+          { path: "admin/users", element: <ManageUsers /> },
         ],
       },
       { path: "*", element: <NotFound /> },
