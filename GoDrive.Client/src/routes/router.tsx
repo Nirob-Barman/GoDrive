@@ -9,7 +9,11 @@ import CarListing from "../pages/public/CarListing";
 import CarDetails from "../pages/public/CarDetails";
 import NotFound from "../pages/public/NotFound";
 import Dashboard from "../pages/user/Dashboard";
+import Profile from "../pages/user/Profile";
+import BookCar from "../pages/user/BookCar";
+import MyReservations from "../pages/user/MyReservations";
 import AdminHome from "../pages/admin/AdminHome";
+import ManageReservations from "../pages/admin/ManageReservations";
 
 export const router = createBrowserRouter([
   {
@@ -23,11 +27,19 @@ export const router = createBrowserRouter([
       { path: "cars/:id", element: <CarDetails /> },
       {
         element: <ProtectedRoute />,
-        children: [{ path: "dashboard", element: <Dashboard /> }],
+        children: [
+          { path: "dashboard", element: <Dashboard /> },
+          { path: "profile", element: <Profile /> },
+          { path: "book/:carId", element: <BookCar /> },
+          { path: "reservations", element: <MyReservations /> },
+        ],
       },
       {
         element: <AdminRoute />,
-        children: [{ path: "admin", element: <AdminHome /> }],
+        children: [
+          { path: "admin", element: <AdminHome /> },
+          { path: "admin/reservations", element: <ManageReservations /> },
+        ],
       },
       { path: "*", element: <NotFound /> },
     ],

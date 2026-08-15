@@ -300,8 +300,7 @@ button {
   font-size: 14px;
 }
 
-.book-now-button,
-button[title] {
+.book-now-button {
   display: inline-block;
   margin-top: 16px;
   padding: 10px 20px;
@@ -316,4 +315,50 @@ button[title] {
 button[disabled] {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.reservation-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reservation-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.reservation-row h2 {
+  font-size: 18px;
+  margin: 0 0 4px;
+}
+
+.reservation-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.reservation-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 0;
+  max-width: 280px;
+}
+
+.reservation-edit-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
 }

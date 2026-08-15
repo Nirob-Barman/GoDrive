@@ -26,6 +26,7 @@ export default function Navbar() {
         {user ? (
           <>
             {user.role === "Admin" && <Link to="/admin">Admin</Link>}
+            <Link to="/reservations">My Reservations</Link>
             <Link to="/dashboard">{user.fullName}</Link>
             <button type="button" onClick={handleLogout}>
               Log out

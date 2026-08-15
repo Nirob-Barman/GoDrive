@@ -76,9 +76,9 @@ export default function CarDetails() {
           Log in to book this car
         </Link>
       ) : (
-        <button type="button" disabled title="Booking opens in the next update">
+        <Link to={`/book/${car.id}`} className="book-now-button">
           Book Now
-        </button>
+        </Link>
       )}
     </div>
   );
