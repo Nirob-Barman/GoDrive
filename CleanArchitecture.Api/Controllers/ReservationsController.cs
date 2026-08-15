@@ -1,6 +1,8 @@
 using CleanArchitecture.Api.Common;
+using CleanArchitecture.Api.Controllers.Requests;
 using CleanArchitecture.Application.Reservations.Commands.CancelReservation;
 using CleanArchitecture.Application.Reservations.Commands.CreateReservation;
+using CleanArchitecture.Application.Reservations.Commands.UpdateReservation;
 using CleanArchitecture.Application.Reservations.Queries.GetMyReservations;
 using CleanArchitecture.Application.Reservations.Queries.GetReservationById;
 using MediatR;
@@ -40,6 +42,14 @@ public class ReservationsController : ControllerBase
     {
         var result = await _sender.Send(new GetReservationByIdQuery(id), cancellationToken);
         return Ok(ApiResponse.Ok(result));
+    }
+
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdateReservation(int id, UpdateReservationRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(
+            new UpdateReservationCommand(id, request.PickupDate, request.DropoffDate), cancellationToken);
+        return Ok(ApiResponse.Ok(result, "Reservation updated"));
     }
 
     [HttpPut("{id:int}/cancel")]

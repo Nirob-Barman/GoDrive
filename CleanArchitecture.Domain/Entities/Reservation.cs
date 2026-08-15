@@ -59,6 +59,24 @@ public class Reservation
         };
     }
 
+    public void Reschedule(DateTime pickupDate, DateTime dropoffDate)
+    {
+        if (Status != ReservationStatus.Pending)
+        {
+            throw new InvalidOperationException("Only a pending reservation can be modified.");
+        }
+
+        if (dropoffDate <= pickupDate)
+        {
+            throw new ArgumentException("Drop-off date must be after the pickup date.", nameof(dropoffDate));
+        }
+
+        PickupDate = pickupDate;
+        DropoffDate = dropoffDate;
+        TotalHours = (int)Math.Ceiling((dropoffDate - pickupDate).TotalHours);
+        TotalAmount = TotalHours * PricePerHourAtBooking;
+    }
+
     public void Approve()
     {
         if (Status != ReservationStatus.Pending)

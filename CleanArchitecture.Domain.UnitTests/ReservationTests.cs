@@ -150,6 +150,43 @@ public class ReservationTests
     }
 
     [Fact]
+    public void Reschedule_updates_dates_and_recalculates_total_while_pending()
+    {
+        var reservation = Reservation.Create("user-1", 1, 10m, DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(2));
+        var newPickup = new DateTime(2026, 9, 1, 10, 0, 0, DateTimeKind.Utc);
+        var newDropoff = newPickup.AddHours(5);
+
+        reservation.Reschedule(newPickup, newDropoff);
+
+        reservation.PickupDate.Should().Be(newPickup);
+        reservation.DropoffDate.Should().Be(newDropoff);
+        reservation.TotalHours.Should().Be(5);
+        reservation.TotalAmount.Should().Be(50m);
+    }
+
+    [Fact]
+    public void Reschedule_throws_once_the_reservation_has_been_approved()
+    {
+        var reservation = CreateApprovedReservation();
+
+        var act = () => reservation.Reschedule(DateTime.UtcNow.AddDays(5), DateTime.UtcNow.AddDays(6));
+
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*pending*");
+    }
+
+    [Fact]
+    public void Reschedule_throws_when_dropoff_is_not_after_pickup()
+    {
+        var reservation = Reservation.Create("user-1", 1, 10m, DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(2));
+        var pickup = DateTime.UtcNow.AddDays(3);
+
+        var act = () => reservation.Reschedule(pickup, pickup);
+
+        act.Should().Throw<ArgumentException>();
+    }
+
+    [Fact]
     public void Reject_records_the_reason_and_is_only_valid_from_pending()
     {
         var reservation = Reservation.Create("user-1", 1, 10m, DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(2));

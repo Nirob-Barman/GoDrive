@@ -124,6 +124,55 @@ public class ReservationsTests : IntegrationTestBase
     }
 
     [Fact]
+    public async Task Update_succeeds_while_pending_but_is_rejected_once_approved()
+    {
+        var (adminClient, customerClient, carId) = await SetupCarAndCustomerAsync("updaterules@test.com");
+
+        var pendingResponse = await customerClient.PostAsJsonAsync(
+            "/api/reservations",
+            ReservationPayload(carId, DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(2)));
+        var pendingId = (await ReadDataAsync<JsonElement>(pendingResponse)).GetProperty("id").GetInt32();
+
+        var now = DateTime.UtcNow;
+        var newPickup = now.AddDays(3);
+        var newDropoff = now.AddDays(4);
+        var updateResponse = await customerClient.PutAsJsonAsync(
+            $"/api/reservations/{pendingId}", new { pickupDate = newPickup, dropoffDate = newDropoff });
+        updateResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var updated = await ReadDataAsync<JsonElement>(updateResponse);
+        updated.GetProperty("totalHours").GetInt32().Should().Be(24);
+
+        await adminClient.PutAsync($"/api/admin/reservations/{pendingId}/approve", null);
+
+        var updateAfterApproval = await customerClient.PutAsJsonAsync(
+            $"/api/reservations/{pendingId}",
+            new { pickupDate = DateTime.UtcNow.AddDays(6), dropoffDate = DateTime.UtcNow.AddDays(7) });
+        updateAfterApproval.StatusCode.Should().Be(HttpStatusCode.Conflict);
+    }
+
+    [Fact]
+    public async Task Update_is_rejected_when_the_new_dates_overlap_another_reservation_on_the_same_car()
+    {
+        var (_, customerClient, carId) = await SetupCarAndCustomerAsync("updateoverlap@test.com");
+
+        var firstResponse = await customerClient.PostAsJsonAsync(
+            "/api/reservations",
+            ReservationPayload(carId, DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(2)));
+        firstResponse.EnsureSuccessStatusCode();
+
+        var secondResponse = await customerClient.PostAsJsonAsync(
+            "/api/reservations",
+            ReservationPayload(carId, DateTime.UtcNow.AddDays(10), DateTime.UtcNow.AddDays(11)));
+        var secondId = (await ReadDataAsync<JsonElement>(secondResponse)).GetProperty("id").GetInt32();
+
+        var updateResponse = await customerClient.PutAsJsonAsync(
+            $"/api/reservations/{secondId}",
+            new { pickupDate = DateTime.UtcNow.AddDays(1).AddHours(6), dropoffDate = DateTime.UtcNow.AddDays(2).AddDays(1) });
+
+        updateResponse.StatusCode.Should().Be(HttpStatusCode.Conflict);
+    }
+
+    [Fact]
     public async Task Pickup_is_blocked_until_payment_succeeds()
     {
         var (adminClient, customerClient, carId) = await SetupCarAndCustomerAsync("paymentgate@test.com");
