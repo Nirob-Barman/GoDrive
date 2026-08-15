@@ -63,6 +63,11 @@ public class GlobalExceptionHandler : IExceptionHandler
                 invalidOpEx.Message,
                 Array.Empty<string>()),
 
+            ArgumentException argEx => (
+                StatusCodes.Status400BadRequest,
+                argEx.Message,
+                Array.Empty<string>()),
+
             IncompleteProfileException incompleteProfileEx => (
                 StatusCodes.Status422UnprocessableEntity,
                 incompleteProfileEx.Message,
