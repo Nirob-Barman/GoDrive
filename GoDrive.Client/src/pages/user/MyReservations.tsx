@@ -4,8 +4,10 @@ import {
   useGetMyReservationsQuery,
   useUpdateReservationMutation,
 } from "../../redux/features/reservations/reservationsApi";
+import { useCreateCheckoutSessionMutation } from "../../redux/features/payments/paymentsApi";
 import type { TReservation } from "../../types/reservations";
 import { getErrorMessage } from "../../utils/getErrorMessage";
+import { setPendingPaymentReservationId } from "../../utils/pendingPayment";
 
 function toDatetimeLocal(isoString: string): string {
   const date = new Date(isoString);
@@ -20,8 +22,19 @@ function ReservationRow({ reservation }: { reservation: TReservation }) {
 
   const [cancelReservation, { isLoading: isCancelling }] = useCancelReservationMutation();
   const [updateReservation, { isLoading: isSaving, error }] = useUpdateReservationMutation();
+  const [createCheckoutSession, { isLoading: isStartingPayment, error: paymentError }] =
+    useCreateCheckoutSessionMutation();
 
   const canModify = reservation.status === "Pending";
+  const canPay = reservation.status === "Approved" && reservation.paymentStatus === "Unpaid";
+
+  const handlePayNow = async () => {
+    const session = await createCheckoutSession(reservation.id).unwrap().catch(() => null);
+    if (!session) return;
+
+    setPendingPaymentReservationId(reservation.id);
+    window.location.href = session.checkoutUrl;
+  };
 
   const handleSave = async () => {
     const result = await updateReservation({
@@ -74,24 +87,29 @@ function ReservationRow({ reservation }: { reservation: TReservation }) {
 
         <p className="car-card-price">${reservation.totalAmount.toFixed(2)}</p>
 
-        {reservation.status === "Approved" && reservation.paymentStatus === "Unpaid" && (
-          <p>Payment required to proceed (coming in a later update).</p>
-        )}
+        {paymentError && <p className="form-error">{getErrorMessage(paymentError)}</p>}
         {reservation.status === "Rejected" && reservation.rejectionReason && (
           <p className="form-error">Reason: {reservation.rejectionReason}</p>
         )}
       </div>
 
-      {canModify && !isEditing && (
-        <div className="reservation-actions">
-          <button type="button" onClick={() => setIsEditing(true)}>
-            Modify
+      <div className="reservation-actions">
+        {canPay && (
+          <button type="button" onClick={handlePayNow} disabled={isStartingPayment}>
+            {isStartingPayment ? "Redirecting..." : "Pay Now"}
           </button>
-          <button type="button" onClick={() => cancelReservation(reservation.id)} disabled={isCancelling}>
-            {isCancelling ? "Cancelling..." : "Cancel"}
-          </button>
-        </div>
-      )}
+        )}
+        {canModify && !isEditing && (
+          <>
+            <button type="button" onClick={() => setIsEditing(true)}>
+              Modify
+            </button>
+            <button type="button" onClick={() => cancelReservation(reservation.id)} disabled={isCancelling}>
+              {isCancelling ? "Cancelling..." : "Cancel"}
+            </button>
+          </>
+        )}
+      </div>
     </li>
   );
 }

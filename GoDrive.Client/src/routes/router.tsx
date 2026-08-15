@@ -12,6 +12,8 @@ import Dashboard from "../pages/user/Dashboard";
 import Profile from "../pages/user/Profile";
 import BookCar from "../pages/user/BookCar";
 import MyReservations from "../pages/user/MyReservations";
+import PaymentReturn from "../pages/user/PaymentReturn";
+import PaymentCancelled from "../pages/user/PaymentCancelled";
 import AdminHome from "../pages/admin/AdminHome";
 import ManageReservations from "../pages/admin/ManageReservations";
 
@@ -32,6 +34,8 @@ export const router = createBrowserRouter([
           { path: "profile", element: <Profile /> },
           { path: "book/:carId", element: <BookCar /> },
           { path: "reservations", element: <MyReservations /> },
+          { path: "payment/return", element: <PaymentReturn /> },
+          { path: "payment/cancelled", element: <PaymentCancelled /> },
         ],
       },
       {
