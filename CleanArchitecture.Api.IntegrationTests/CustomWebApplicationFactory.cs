@@ -29,6 +29,14 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
     private Respawner _respawner = null!;
     private SqlConnection _respawnConnection = null!;
 
+    public CustomWebApplicationFactory()
+    {
+        // The refresh-token cookie is Secure, so HttpClient's cookie container only resends it on
+        // https requests - the in-memory TestServer never does real TLS, but treating the client's
+        // BaseAddress as https is enough for cookie handling to behave like a real browser would.
+        ClientOptions.BaseAddress = new Uri("https://localhost");
+    }
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureAppConfiguration((_, config) =>

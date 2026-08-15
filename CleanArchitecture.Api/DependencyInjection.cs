@@ -3,13 +3,14 @@ using CleanArchitecture.Api.Common;
 using CleanArchitecture.Api.Middleware;
 using CleanArchitecture.Api.Services;
 using CleanArchitecture.Application.Common.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 
 namespace CleanArchitecture.Api;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApiServices(this IServiceCollection services)
+    public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddControllers()
             .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
@@ -19,11 +20,16 @@ public static class DependencyInjection
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddAuthorization();
 
-        // Vite's default dev server port - the React client (GoDrive.Client) is the only browser caller.
+        // The React client's origin - not a secret, but read from .env (CORS__ALLOWEDORIGIN) rather than
+        // appsettings.json since that file is fully git-ignored in this repo with no committed template.
+        // AllowCredentials is required so the browser sends/receives the httpOnly refresh-token cookie;
+        // it cannot be combined with AllowAnyOrigin, which is why a single explicit origin is required here.
+        var allowedOrigin = configuration["Cors:AllowedOrigin"] ?? "http://localhost:5173";
         services.AddCors(options => options.AddPolicy(CorsPolicies.WebClient, policy => policy
-            .WithOrigins("http://localhost:5173")
+            .WithOrigins(allowedOrigin)
             .AllowAnyHeader()
-            .AllowAnyMethod()));
+            .AllowAnyMethod()
+            .AllowCredentials()));
 
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();

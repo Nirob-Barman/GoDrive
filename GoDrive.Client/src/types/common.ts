@@ -11,10 +11,11 @@ export type TApiErrorEnvelope = {
   errors: string[];
 };
 
+// Mirrors CleanArchitecture.Application.Common.Models.PaginatedList<T> exactly -
+// note there is no `pageSize` field on the backend type, only these four.
 export type TPaginatedList<T> = {
   items: T[];
   pageNumber: number;
-  pageSize: number;
   totalCount: number;
   totalPages: number;
 };

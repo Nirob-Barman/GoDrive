@@ -7,12 +7,12 @@ export type TAuthUser = {
   role: TRole;
 };
 
-// Mirrors CleanArchitecture.Application.Authentication.Commands.Login.LoginResponse
-export type TLoginResponse = {
+// Mirrors CleanArchitecture.Api.Controllers.Responses.AuthResponse - deliberately has
+// no refreshToken field. The refresh token never leaves the httpOnly cookie the
+// backend sets directly; it's never visible to (or held by) this client's JS at all.
+export type TAuthResponse = {
   token: string;
   expiresAtUtc: string;
-  refreshToken: string;
-  refreshTokenExpiresAtUtc: string;
   userId: string;
   email: string;
   fullName: string;

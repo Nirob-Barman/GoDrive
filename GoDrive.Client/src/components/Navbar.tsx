@@ -1,19 +1,16 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { logout, selectCurrentRefreshToken, selectCurrentUser } from "../redux/features/auth/authSlice";
+import { logout, selectCurrentUser } from "../redux/features/auth/authSlice";
 import { useLogoutMutation } from "../redux/features/auth/authApi";
 
 export default function Navbar() {
   const user = useAppSelector(selectCurrentUser);
-  const refreshToken = useAppSelector(selectCurrentRefreshToken);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [logoutRequest] = useLogoutMutation();
 
   const handleLogout = async () => {
-    if (refreshToken) {
-      await logoutRequest({ refreshToken }).catch(() => undefined);
-    }
+    await logoutRequest().catch(() => undefined);
     dispatch(logout());
     navigate("/");
   };

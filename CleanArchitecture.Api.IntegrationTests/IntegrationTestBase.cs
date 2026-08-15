@@ -61,6 +61,15 @@ public abstract class IntegrationTestBase : IAsyncLifetime
         return client;
     }
 
+    // For tests that need to inspect/replay the raw refresh-token cookie value directly -
+    // a client with its own automatic cookie handling would hide the Set-Cookie value from us.
+    protected HttpClient ClientWithoutCookieHandling() =>
+        _factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
+        {
+            BaseAddress = new Uri("https://localhost"),
+            HandleCookies = false,
+        });
+
     protected static async Task<T> ReadDataAsync<T>(HttpResponseMessage response)
     {
         var json = await response.Content.ReadFromJsonAsync<JsonElement>();
