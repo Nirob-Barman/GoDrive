@@ -134,7 +134,7 @@ export default function CarForm() {
     <div>
       <PageHeader title={isEditMode ? "Edit Car" : "Add Car"} />
 
-      <form onSubmit={handleSubmit} style={{ maxWidth: "640px" }}>
+      <form onSubmit={handleSubmit} className="field-group" style={{ maxWidth: "640px" }}>
         <div className="form-section">
           <h2>Basic Information</h2>
           <div className="field-group">

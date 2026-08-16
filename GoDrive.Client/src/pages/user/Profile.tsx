@@ -143,7 +143,7 @@ export default function Profile() {
         subtitle="A National ID/Passport number and Driving License number are required before you can book a car."
       />
 
-      <form onSubmit={handleSubmit} style={{ maxWidth: "640px" }}>
+      <form onSubmit={handleSubmit} className="field-group" style={{ maxWidth: "640px" }}>
         <div className="form-section">
           <h2>Personal Information</h2>
           <div className="field-group">

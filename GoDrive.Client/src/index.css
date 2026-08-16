@@ -275,7 +275,7 @@ button[disabled],
   gap: var(--space-2);
 }
 
-.navbar-links a {
+.navbar-links a:not(.btn) {
   color: var(--text);
   text-decoration: none;
   font-size: 14px;
@@ -283,11 +283,11 @@ button[disabled],
   padding: 6px 10px;
   border-radius: var(--radius-sm);
 }
-.navbar-links a:hover {
+.navbar-links a:not(.btn):hover {
   background: var(--surface-alt);
   color: var(--text-h);
 }
-.navbar-links a.active {
+.navbar-links a.active:not(.btn) {
   background: var(--primary-bg);
   color: var(--primary);
 }
