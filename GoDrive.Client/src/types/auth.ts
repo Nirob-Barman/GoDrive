@@ -38,3 +38,23 @@ export type TRegisterResponse = {
   userId: string;
   email: string;
 };
+
+// Mirrors CleanArchitecture.Application.Authentication.Commands.ChangePassword.ChangePasswordCommand
+export type TChangePasswordRequest = {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+};
+
+// Mirrors CleanArchitecture.Application.Authentication.Commands.ForgotPassword.ForgotPasswordCommand
+export type TForgotPasswordRequest = {
+  email: string;
+};
+
+// Mirrors CleanArchitecture.Application.Authentication.Commands.ResetPassword.ResetPasswordCommand
+export type TResetPasswordRequest = {
+  email: string;
+  token: string;
+  newPassword: string;
+  confirmNewPassword: string;
+};

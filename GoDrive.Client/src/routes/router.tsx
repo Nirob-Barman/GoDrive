@@ -5,6 +5,8 @@ import AdminRoute from "./AdminRoute";
 import Home from "../pages/public/Home";
 import Login from "../pages/public/Login";
 import Register from "../pages/public/Register";
+import ForgotPassword from "../pages/public/ForgotPassword";
+import ResetPassword from "../pages/public/ResetPassword";
 import CarListing from "../pages/public/CarListing";
 import CarDetails from "../pages/public/CarDetails";
 import NotFound from "../pages/public/NotFound";
@@ -29,6 +31,8 @@ export const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
+      { path: "forgot-password", element: <ForgotPassword /> },
+      { path: "reset-password", element: <ResetPassword /> },
       { path: "cars", element: <CarListing /> },
       { path: "cars/:id", element: <CarDetails /> },
       {

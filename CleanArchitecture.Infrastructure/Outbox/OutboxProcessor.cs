@@ -3,6 +3,7 @@ using CleanArchitecture.Application.Common.Interfaces;
 using CleanArchitecture.Application.Common.Outbox;
 using CleanArchitecture.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -17,11 +18,14 @@ public class OutboxProcessor : BackgroundService
 
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<OutboxProcessor> _logger;
+    private readonly string _frontendOrigin;
 
-    public OutboxProcessor(IServiceScopeFactory scopeFactory, ILogger<OutboxProcessor> logger)
+    public OutboxProcessor(IServiceScopeFactory scopeFactory, ILogger<OutboxProcessor> logger, IConfiguration configuration)
     {
         _scopeFactory = scopeFactory;
         _logger = logger;
+        // Same config key CORS already reads - it's the frontend's origin either way.
+        _frontendOrigin = configuration["Cors:AllowedOrigin"] ?? "http://localhost:5173";
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -69,7 +73,7 @@ public class OutboxProcessor : BackgroundService
         {
             try
             {
-                await DispatchAsync(message, emailService, cancellationToken);
+                await DispatchAsync(message, emailService, _frontendOrigin, cancellationToken);
                 message.MarkProcessed();
             }
             catch (Exception ex)
@@ -83,7 +87,7 @@ public class OutboxProcessor : BackgroundService
     }
 
     private static async Task DispatchAsync(
-        Domain.Entities.OutboxMessage message, IEmailService emailService, CancellationToken cancellationToken)
+        Domain.Entities.OutboxMessage message, IEmailService emailService, string frontendOrigin, CancellationToken cancellationToken)
     {
         switch (message.Type)
         {
@@ -121,11 +125,14 @@ public class OutboxProcessor : BackgroundService
                 var payload = JsonSerializer.Deserialize<PasswordResetEmailPayload>(message.Payload)
                     ?? throw new InvalidOperationException("Invalid PasswordResetEmail payload.");
 
+                var resetLink =
+                    $"{frontendOrigin}/reset-password?email={Uri.EscapeDataString(payload.Email)}&token={Uri.EscapeDataString(payload.Token)}";
                 var body =
                     $"<p>Hi {payload.FullName},</p>" +
-                    $"<p>Use this code to reset your GoDrive password:</p>" +
+                    $"<p><a href=\"{resetLink}\">Click here to reset your GoDrive password</a>.</p>" +
+                    $"<p>Or use this code directly on the reset password page:</p>" +
                     $"<p style=\"font-family:monospace;font-size:14px\">{payload.Token}</p>" +
-                    $"<p>Submit it along with your email and new password to the reset-password endpoint. If you didn't request this, ignore this email.</p>";
+                    $"<p>If you didn't request this, ignore this email.</p>";
 
                 await emailService.SendAsync(payload.Email, "Reset your GoDrive password", body, cancellationToken);
                 break;
