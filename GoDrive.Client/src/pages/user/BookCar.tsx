@@ -4,6 +4,8 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useGetCarByIdQuery } from "../../redux/features/cars/carsApi";
 import { useGetMyProfileQuery } from "../../redux/features/users/usersApi";
 import { useCreateReservationMutation } from "../../redux/features/reservations/reservationsApi";
+import PageHeader from "../../components/ui/PageHeader";
+import { SkeletonRows } from "../../components/ui/Skeleton";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 
 export default function BookCar() {
@@ -21,7 +23,12 @@ export default function BookCar() {
   const [dropoffDate, setDropoffDate] = useState("");
 
   if (isLoadingCar || isLoadingProfile) {
-    return <p>Loading...</p>;
+    return (
+      <div>
+        <PageHeader title="Book a Car" />
+        <SkeletonRows count={2} />
+      </div>
+    );
   }
 
   if (!car) {
@@ -68,36 +75,39 @@ export default function BookCar() {
   };
 
   return (
-    <div className="auth-form">
-      <h1>Book {car.name}</h1>
-      <p className="car-card-price">${car.pricePerHour.toFixed(2)} / hour</p>
+    <div>
+      <PageHeader title={`Book ${car.name}`} subtitle={`${car.brand} ${car.model} · ${car.year}`} />
 
-      <form onSubmit={handleSubmit}>
-        <label>
-          Pickup date &amp; time
-          <input
-            type="datetime-local"
-            value={pickupDate}
-            onChange={(e) => setPickupDate(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Drop-off date &amp; time
-          <input
-            type="datetime-local"
-            value={dropoffDate}
-            onChange={(e) => setDropoffDate(e.target.value)}
-            required
-          />
-        </label>
+      <div className="form-section" style={{ maxWidth: "480px" }}>
+        <p className="car-card-price">${car.pricePerHour.toFixed(2)} / hour</p>
 
-        {error && <p className="form-error">{getErrorMessage(error)}</p>}
+        <form onSubmit={handleSubmit} className="field-group">
+          <label>
+            Pickup date &amp; time
+            <input
+              type="datetime-local"
+              value={pickupDate}
+              onChange={(e) => setPickupDate(e.target.value)}
+              required
+            />
+          </label>
+          <label>
+            Drop-off date &amp; time
+            <input
+              type="datetime-local"
+              value={dropoffDate}
+              onChange={(e) => setDropoffDate(e.target.value)}
+              required
+            />
+          </label>
 
-        <button type="submit" disabled={isBooking}>
-          {isBooking ? "Booking..." : "Confirm Booking"}
-        </button>
-      </form>
+          {error && <p className="form-error">{getErrorMessage(error)}</p>}
+
+          <button type="submit" className="btn btn-primary" disabled={isBooking}>
+            {isBooking ? "Booking..." : "Confirm Booking"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
