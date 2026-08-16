@@ -5,7 +5,11 @@ import {
   useUpdateReservationMutation,
 } from "../../redux/features/reservations/reservationsApi";
 import { useCreateCheckoutSessionMutation } from "../../redux/features/payments/paymentsApi";
-import type { TReservation } from "../../types/reservations";
+import { ReservationStatusBadge, PaymentStatusBadge } from "../../components/ui/StatusBadge";
+import PageHeader from "../../components/ui/PageHeader";
+import EmptyState from "../../components/ui/EmptyState";
+import { SkeletonRows } from "../../components/ui/Skeleton";
+import type { TReservation, TReservationStatus } from "../../types/reservations";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import { setPendingPaymentReservationId } from "../../utils/pendingPayment";
 
@@ -54,9 +58,10 @@ function ReservationRow({ reservation }: { reservation: TReservation }) {
     <li className="reservation-row">
       <div>
         <h2>{reservation.carName}</h2>
-        <p>
-          {reservation.status} &middot; Payment: {reservation.paymentStatus}
-        </p>
+        <div className="reservation-meta-row">
+          <ReservationStatusBadge status={reservation.status} />
+          <PaymentStatusBadge status={reservation.paymentStatus} />
+        </div>
 
         {isEditing ? (
           <div className="reservation-edit-form">
@@ -70,16 +75,16 @@ function ReservationRow({ reservation }: { reservation: TReservation }) {
             </label>
             {error && <p className="form-error">{getErrorMessage(error)}</p>}
             <div>
-              <button type="button" onClick={handleSave} disabled={isSaving}>
+              <button type="button" className="btn btn-primary btn-sm" onClick={handleSave} disabled={isSaving}>
                 {isSaving ? "Saving..." : "Save"}
               </button>
-              <button type="button" onClick={() => setIsEditing(false)}>
+              <button type="button" className="btn btn-sm" onClick={() => setIsEditing(false)}>
                 Cancel edit
               </button>
             </div>
           </div>
         ) : (
-          <p>
+          <p className="text-sm" style={{ marginTop: "6px" }}>
             {new Date(reservation.pickupDate).toLocaleString()} &rarr;{" "}
             {new Date(reservation.dropoffDate).toLocaleString()}
           </p>
@@ -95,16 +100,21 @@ function ReservationRow({ reservation }: { reservation: TReservation }) {
 
       <div className="reservation-actions">
         {canPay && (
-          <button type="button" onClick={handlePayNow} disabled={isStartingPayment}>
+          <button type="button" className="btn btn-primary btn-sm" onClick={handlePayNow} disabled={isStartingPayment}>
             {isStartingPayment ? "Redirecting..." : "Pay Now"}
           </button>
         )}
         {canModify && !isEditing && (
           <>
-            <button type="button" onClick={() => setIsEditing(true)}>
+            <button type="button" className="btn btn-sm" onClick={() => setIsEditing(true)}>
               Modify
             </button>
-            <button type="button" onClick={() => cancelReservation(reservation.id)} disabled={isCancelling}>
+            <button
+              type="button"
+              className="btn btn-danger btn-sm"
+              onClick={() => cancelReservation(reservation.id)}
+              disabled={isCancelling}
+            >
               {isCancelling ? "Cancelling..." : "Cancel"}
             </button>
           </>
@@ -114,36 +124,75 @@ function ReservationRow({ reservation }: { reservation: TReservation }) {
   );
 }
 
+const STATUS_TABS: Array<{ label: string; value: TReservationStatus | "All" }> = [
+  { label: "All", value: "All" },
+  { label: "Pending", value: "Pending" },
+  { label: "Approved", value: "Approved" },
+  { label: "Picked Up", value: "PickedUp" },
+  { label: "Returned", value: "Returned" },
+  { label: "Rejected", value: "Rejected" },
+  { label: "Cancelled", value: "Cancelled" },
+];
+
 export default function MyReservations() {
   const [pageNumber, setPageNumber] = useState(1);
+  const [activeTab, setActiveTab] = useState<TReservationStatus | "All">("All");
   const { data, isLoading, isFetching } = useGetMyReservationsQuery({ pageNumber, pageSize: 10 });
 
-  if (isLoading) {
-    return <p>Loading your reservations...</p>;
-  }
+  // The backend's GetMyReservationsQuery has no status filter param - these tabs filter
+  // the currently-loaded page client-side rather than adding a new query parameter.
+  const visibleItems = data?.items.filter((r) => activeTab === "All" || r.status === activeTab) ?? [];
 
   return (
     <div>
-      <h1>My Reservations</h1>
+      <PageHeader title="My Reservations" />
 
-      {data && data.items.length === 0 && <p>You have no reservations yet.</p>}
-
-      <ul className="reservation-list">
-        {data?.items.map((reservation) => (
-          <ReservationRow key={reservation.id} reservation={reservation} />
+      <div className="status-tabs">
+        {STATUS_TABS.map((tab) => (
+          <button
+            key={tab.value}
+            type="button"
+            className={`status-tab${activeTab === tab.value ? " active" : ""}`}
+            onClick={() => setActiveTab(tab.value)}
+          >
+            {tab.label}
+          </button>
         ))}
-      </ul>
+      </div>
+
+      {isLoading && <SkeletonRows count={3} />}
+
+      {data && visibleItems.length === 0 && (
+        <EmptyState
+          title={activeTab === "All" ? "You have no reservations yet" : `No ${activeTab} reservations`}
+          description={activeTab === "All" ? "Browse cars to make your first booking." : undefined}
+        />
+      )}
+
+      {visibleItems.length > 0 && (
+        <ul className="reservation-list">
+          {visibleItems.map((reservation) => (
+            <ReservationRow key={reservation.id} reservation={reservation} />
+          ))}
+        </ul>
+      )}
 
       {data && data.totalPages > 1 && (
         <div className="pagination">
-          <button type="button" disabled={pageNumber <= 1 || isFetching} onClick={() => setPageNumber((p) => p - 1)}>
+          <button
+            type="button"
+            className="btn btn-sm"
+            disabled={pageNumber <= 1 || isFetching}
+            onClick={() => setPageNumber((p) => p - 1)}
+          >
             Previous
           </button>
-          <span>
+          <span className="text-sm">
             Page {data.pageNumber} of {data.totalPages}
           </span>
           <button
             type="button"
+            className="btn btn-sm"
             disabled={pageNumber >= data.totalPages || isFetching}
             onClick={() => setPageNumber((p) => p + 1)}
           >
