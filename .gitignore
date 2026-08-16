@@ -69,6 +69,10 @@ anthropic.*
 plan.md
 PLAN.md
 
+# Local user manual (contains dev credentials/URLs — never commit)
+USERMANUAL.md
+usermanual.md
+
 # Claude config / logs
 *.claude.json
 claude.log
