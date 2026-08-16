@@ -6,10 +6,22 @@ import {
   useRejectReservationMutation,
   useReturnCarMutation,
 } from "../../redux/features/reservations/reservationsApi";
+import { ReservationStatusBadge, PaymentStatusBadge } from "../../components/ui/StatusBadge";
+import PageHeader from "../../components/ui/PageHeader";
+import EmptyState from "../../components/ui/EmptyState";
+import { SkeletonRows } from "../../components/ui/Skeleton";
 import type { TReservation, TReservationStatus } from "../../types/reservations";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 
-const STATUSES: TReservationStatus[] = ["Pending", "Approved", "PickedUp", "Returned", "Rejected", "Cancelled"];
+const STATUS_TABS: Array<{ label: string; value: TReservationStatus | "" }> = [
+  { label: "All", value: "" },
+  { label: "Pending", value: "Pending" },
+  { label: "Approved", value: "Approved" },
+  { label: "Picked Up", value: "PickedUp" },
+  { label: "Returned", value: "Returned" },
+  { label: "Rejected", value: "Rejected" },
+  { label: "Cancelled", value: "Cancelled" },
+];
 
 function ReservationActions({ reservation }: { reservation: TReservation }) {
   const [approve, { isLoading: isApproving, error: approveError }] = useApproveReservationMutation();
@@ -28,10 +40,10 @@ function ReservationActions({ reservation }: { reservation: TReservation }) {
     <div className="reservation-actions">
       {reservation.status === "Pending" && (
         <>
-          <button type="button" onClick={() => approve(reservation.id)} disabled={isApproving}>
+          <button type="button" className="btn btn-primary btn-sm" onClick={() => approve(reservation.id)} disabled={isApproving}>
             Approve
           </button>
-          <button type="button" onClick={handleReject} disabled={isRejecting}>
+          <button type="button" className="btn btn-danger btn-sm" onClick={handleReject} disabled={isRejecting}>
             Reject
           </button>
         </>
@@ -39,6 +51,7 @@ function ReservationActions({ reservation }: { reservation: TReservation }) {
       {reservation.status === "Approved" && (
         <button
           type="button"
+          className="btn btn-primary btn-sm"
           onClick={() => markPickedUp(reservation.id)}
           disabled={isPickingUp || reservation.paymentStatus !== "Paid"}
           title={reservation.paymentStatus !== "Paid" ? "Payment must be completed first" : undefined}
@@ -47,7 +60,7 @@ function ReservationActions({ reservation }: { reservation: TReservation }) {
         </button>
       )}
       {reservation.status === "PickedUp" && (
-        <button type="button" onClick={() => returnCar(reservation.id)} disabled={isReturning}>
+        <button type="button" className="btn btn-primary btn-sm" onClick={() => returnCar(reservation.id)} disabled={isReturning}>
           Mark Returned
         </button>
       )}
@@ -68,58 +81,70 @@ export default function ManageReservations() {
 
   return (
     <div>
-      <h1>Manage Reservations</h1>
+      <PageHeader title="Manage Reservations" subtitle="Approve, reject, and track the rental lifecycle." />
 
-      <select
-        value={status}
-        onChange={(e) => {
-          setStatus(e.target.value as TReservationStatus | "");
-          setPageNumber(1);
-        }}
-      >
-        <option value="">All statuses</option>
-        {STATUSES.map((s) => (
-          <option key={s} value={s}>
-            {s}
-          </option>
+      <div className="status-tabs">
+        {STATUS_TABS.map((tab) => (
+          <button
+            key={tab.label}
+            type="button"
+            className={`status-tab${status === tab.value ? " active" : ""}`}
+            onClick={() => {
+              setStatus(tab.value);
+              setPageNumber(1);
+            }}
+          >
+            {tab.label}
+          </button>
         ))}
-      </select>
+      </div>
 
-      {isLoading && <p>Loading reservations...</p>}
+      {isLoading && <SkeletonRows count={4} />}
 
-      <ul className="reservation-list">
-        {data?.items.map((reservation) => (
-          <li key={reservation.id} className="reservation-row">
-            <div>
-              <h2>
-                #{reservation.id} &middot; {reservation.carName}
-              </h2>
-              <p>
-                {reservation.status} &middot; Payment: {reservation.paymentStatus}
-              </p>
-              <p>
-                {new Date(reservation.pickupDate).toLocaleString()} &rarr;{" "}
-                {new Date(reservation.dropoffDate).toLocaleString()}
-              </p>
-              <p className="car-card-price">${reservation.totalAmount.toFixed(2)}</p>
-            </div>
-            <ReservationActions reservation={reservation} />
-          </li>
-        ))}
-      </ul>
+      {data && data.items.length === 0 && (
+        <EmptyState title="No reservations match this filter" />
+      )}
 
-      {data && data.items.length === 0 && <p>No reservations match this filter.</p>}
+      {data && data.items.length > 0 && (
+        <ul className="reservation-list">
+          {data.items.map((reservation) => (
+            <li key={reservation.id} className="reservation-row">
+              <div>
+                <h2>
+                  #{reservation.id} &middot; {reservation.carName}
+                </h2>
+                <div className="reservation-meta-row">
+                  <ReservationStatusBadge status={reservation.status} />
+                  <PaymentStatusBadge status={reservation.paymentStatus} />
+                </div>
+                <p className="text-sm" style={{ marginTop: "6px" }}>
+                  {new Date(reservation.pickupDate).toLocaleString()} &rarr;{" "}
+                  {new Date(reservation.dropoffDate).toLocaleString()}
+                </p>
+                <p className="car-card-price">${reservation.totalAmount.toFixed(2)}</p>
+              </div>
+              <ReservationActions reservation={reservation} />
+            </li>
+          ))}
+        </ul>
+      )}
 
       {data && data.totalPages > 1 && (
         <div className="pagination">
-          <button type="button" disabled={pageNumber <= 1 || isFetching} onClick={() => setPageNumber((p) => p - 1)}>
+          <button
+            type="button"
+            className="btn btn-sm"
+            disabled={pageNumber <= 1 || isFetching}
+            onClick={() => setPageNumber((p) => p - 1)}
+          >
             Previous
           </button>
-          <span>
+          <span className="text-sm">
             Page {data.pageNumber} of {data.totalPages}
           </span>
           <button
             type="button"
+            className="btn btn-sm"
             disabled={pageNumber >= data.totalPages || isFetching}
             onClick={() => setPageNumber((p) => p + 1)}
           >
