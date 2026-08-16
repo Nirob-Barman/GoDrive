@@ -1,7 +1,16 @@
-import { Link, useNavigate } from "react-router-dom";
+import type { ReactNode } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { logout, selectCurrentUser } from "../redux/features/auth/authSlice";
 import { useLogoutMutation } from "../redux/features/auth/authApi";
+
+function NavItem({ to, children }: { to: string; children: ReactNode }) {
+  return (
+    <NavLink to={to} className={({ isActive }) => (isActive ? "active" : undefined)}>
+      {children}
+    </NavLink>
+  );
+}
 
 export default function Navbar() {
   const user = useAppSelector(selectCurrentUser);
@@ -17,25 +26,27 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
-      <Link to="/" className="navbar-brand">
+      <NavLink to="/" className="navbar-brand" end>
         GoDrive
-      </Link>
+      </NavLink>
 
       <div className="navbar-links">
-        <Link to="/cars">Cars</Link>
+        <NavItem to="/cars">Cars</NavItem>
         {user ? (
           <>
-            {user.role === "Admin" && <Link to="/admin">Admin</Link>}
-            <Link to="/reservations">My Reservations</Link>
-            <Link to="/dashboard">{user.fullName}</Link>
-            <button type="button" onClick={handleLogout}>
+            {user.role === "Admin" && <NavItem to="/admin">Admin</NavItem>}
+            <NavItem to="/reservations">My Reservations</NavItem>
+            <NavItem to="/profile">{user.fullName}</NavItem>
+            <button type="button" className="btn btn-sm" onClick={handleLogout}>
               Log out
             </button>
           </>
         ) : (
           <>
-            <Link to="/login">Log in</Link>
-            <Link to="/register">Sign up</Link>
+            <NavItem to="/login">Log in</NavItem>
+            <NavLink to="/register" className="btn btn-primary btn-sm">
+              Sign up
+            </NavLink>
           </>
         )}
       </div>

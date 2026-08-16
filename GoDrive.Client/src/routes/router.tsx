@@ -1,5 +1,6 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import RootLayout from "../components/RootLayout";
+import AdminLayout from "../components/AdminLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminRoute from "./AdminRoute";
 import Home from "../pages/public/Home";
@@ -16,7 +17,6 @@ import BookCar from "../pages/user/BookCar";
 import MyReservations from "../pages/user/MyReservations";
 import PaymentReturn from "../pages/user/PaymentReturn";
 import PaymentCancelled from "../pages/user/PaymentCancelled";
-import AdminHome from "../pages/admin/AdminHome";
 import ManageReservations from "../pages/admin/ManageReservations";
 import ManageCars from "../pages/admin/ManageCars";
 import CarForm from "../pages/admin/CarForm";
@@ -49,13 +49,19 @@ export const router = createBrowserRouter([
       {
         element: <AdminRoute />,
         children: [
-          { path: "admin", element: <AdminHome /> },
-          { path: "admin/dashboard", element: <AdminDashboard /> },
-          { path: "admin/reservations", element: <ManageReservations /> },
-          { path: "admin/cars", element: <ManageCars /> },
-          { path: "admin/cars/new", element: <CarForm /> },
-          { path: "admin/cars/:id/edit", element: <CarForm /> },
-          { path: "admin/users", element: <ManageUsers /> },
+          {
+            path: "admin",
+            element: <AdminLayout />,
+            children: [
+              { index: true, element: <Navigate to="/admin/dashboard" replace /> },
+              { path: "dashboard", element: <AdminDashboard /> },
+              { path: "reservations", element: <ManageReservations /> },
+              { path: "cars", element: <ManageCars /> },
+              { path: "cars/new", element: <CarForm /> },
+              { path: "cars/:id/edit", element: <CarForm /> },
+              { path: "users", element: <ManageUsers /> },
+            ],
+          },
         ],
       },
       { path: "*", element: <NotFound /> },
