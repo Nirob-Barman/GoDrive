@@ -9,6 +9,8 @@ import {
 } from "../../redux/features/auth/authApi";
 import { useAppDispatch } from "../../redux/hooks";
 import { logout } from "../../redux/features/auth/authSlice";
+import PageHeader from "../../components/ui/PageHeader";
+import { SkeletonRows } from "../../components/ui/Skeleton";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 
 function ChangePasswordSection() {
@@ -32,9 +34,9 @@ function ChangePasswordSection() {
   };
 
   return (
-    <div className="auth-form">
-      <h2>Change Password</h2>
-      <form onSubmit={handleSubmit}>
+    <div>
+      <h3>Change Password</h3>
+      <form onSubmit={handleSubmit} className="field-group">
         <label>
           Current password
           <input
@@ -59,9 +61,9 @@ function ChangePasswordSection() {
         </label>
 
         {error && <p className="form-error">{getErrorMessage(error)}</p>}
-        {message && <p>{message}</p>}
+        {message && <p className="form-success">{message}</p>}
 
-        <button type="submit" disabled={isLoading}>
+        <button type="submit" className="btn btn-primary" disabled={isLoading}>
           {isLoading ? "Changing..." : "Change Password"}
         </button>
       </form>
@@ -85,10 +87,10 @@ function LogOutEverywhereSection() {
   };
 
   return (
-    <div className="auth-form">
-      <h2>Sessions</h2>
-      <p>Log out of every device where you're currently signed in, including this one.</p>
-      <button type="button" onClick={handleClick} disabled={isLoading}>
+    <div style={{ marginTop: "var(--space-5)" }}>
+      <h3>Sessions</h3>
+      <p className="form-section-hint">Log out of every device where you're currently signed in, including this one.</p>
+      <button type="button" className="btn btn-danger" onClick={handleClick} disabled={isLoading}>
         {isLoading ? "Logging out everywhere..." : "Log Out Everywhere"}
       </button>
     </div>
@@ -126,58 +128,75 @@ export default function Profile() {
   };
 
   if (isLoading) {
-    return <p>Loading profile...</p>;
+    return (
+      <div>
+        <PageHeader title="My Profile" />
+        <SkeletonRows count={3} />
+      </div>
+    );
   }
 
   return (
-    <>
-      <div className="auth-form">
-        <h1>My Profile</h1>
-        <p>
-          A National ID/Passport number and Driving License number are required before you can book a car.
-        </p>
+    <div>
+      <PageHeader
+        title="My Profile"
+        subtitle="A National ID/Passport number and Driving License number are required before you can book a car."
+      />
 
-        <form onSubmit={handleSubmit}>
-          <label>
-            Full name
-            <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
-          </label>
-          <label>
-            Phone number
-            <input type="text" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
-          </label>
-          <label>
-            Address
-            <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} />
-          </label>
-          <label>
-            NID / Passport number
-            <input
-              type="text"
-              value={nidOrPassportNumber}
-              onChange={(e) => setNidOrPassportNumber(e.target.value)}
-            />
-          </label>
-          <label>
-            Driving license number
-            <input
-              type="text"
-              value={drivingLicenseNumber}
-              onChange={(e) => setDrivingLicenseNumber(e.target.value)}
-            />
-          </label>
+      <form onSubmit={handleSubmit} style={{ maxWidth: "640px" }}>
+        <div className="form-section">
+          <h2>Personal Information</h2>
+          <div className="field-group">
+            <label>
+              Full name
+              <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+            </label>
+            <label>
+              Phone number
+              <input type="text" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
+            </label>
+            <label>
+              Address
+              <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} />
+            </label>
+          </div>
+        </div>
 
-          {error && <p className="form-error">{getErrorMessage(error)}</p>}
-          {isSuccess && <p>Profile saved.</p>}
+        <div className="form-section">
+          <h2>Identity &amp; Driving Information</h2>
+          <div className="field-group">
+            <label>
+              NID / Passport number
+              <input
+                type="text"
+                value={nidOrPassportNumber}
+                onChange={(e) => setNidOrPassportNumber(e.target.value)}
+              />
+            </label>
+            <label>
+              Driving license number
+              <input
+                type="text"
+                value={drivingLicenseNumber}
+                onChange={(e) => setDrivingLicenseNumber(e.target.value)}
+              />
+            </label>
+          </div>
+        </div>
 
-          <button type="submit" disabled={isSaving}>
-            {isSaving ? "Saving..." : "Save"}
-          </button>
-        </form>
+        {error && <p className="form-error">{getErrorMessage(error)}</p>}
+        {isSuccess && <p className="form-success">Profile saved.</p>}
+
+        <button type="submit" className="btn btn-primary" disabled={isSaving}>
+          {isSaving ? "Saving..." : "Save"}
+        </button>
+      </form>
+
+      <div className="form-section" style={{ maxWidth: "640px" }}>
+        <h2>Security</h2>
+        <ChangePasswordSection />
+        <LogOutEverywhereSection />
       </div>
-
-      <ChangePasswordSection />
-      <LogOutEverywhereSection />
-    </>
+    </div>
   );
 }
