@@ -9,6 +9,8 @@ import {
   useGetCarReviewsQuery,
   useUpdateReviewMutation,
 } from "../redux/features/reviews/reviewsApi";
+import EmptyState from "./ui/EmptyState";
+import { SkeletonRows } from "./ui/Skeleton";
 import type { TReview } from "../types/reviews";
 import { getErrorMessage } from "../utils/getErrorMessage";
 
@@ -60,7 +62,7 @@ function ReviewForm({
 
       {error && <p className="form-error">{getErrorMessage(error)}</p>}
 
-      <button type="submit" disabled={isLoading}>
+      <button type="submit" className="btn btn-primary" disabled={isLoading}>
         {isLoading ? "Saving..." : existingReview ? "Update Review" : "Submit Review"}
       </button>
     </form>
@@ -85,15 +87,19 @@ export default function CarReviews({ carId }: { carId: number }) {
     <div className="car-reviews">
       <h2>Reviews</h2>
 
-      {isLoading && <p>Loading reviews...</p>}
-      {data && data.items.length === 0 && <p>No reviews yet.</p>}
+      {isLoading && <SkeletonRows count={2} height={60} />}
+      {data && data.items.length === 0 && <EmptyState title="No reviews yet" />}
 
       <ul className="review-list">
         {data?.items.map((review) => (
           <li key={review.id} className="review-item">
             <p className="review-meta">
-              <strong>{review.userFullName}</strong> &middot; {review.rating} / 5 &middot;{" "}
-              {new Date(review.createdAtUtc).toLocaleDateString()}
+              <strong>{review.userFullName}</strong> &middot;{" "}
+              <span className="car-details-rating">
+                <span className="car-details-rating-star">&#9733;</span>
+                {review.rating} / 5
+              </span>{" "}
+              &middot; {new Date(review.createdAtUtc).toLocaleDateString()}
               {review.updatedAtUtc && " (edited)"}
             </p>
             {review.comment && <p>{review.comment}</p>}
@@ -103,29 +109,35 @@ export default function CarReviews({ carId }: { carId: number }) {
 
       {data && data.totalPages > 1 && (
         <div className="pagination">
-          <button type="button" disabled={pageNumber <= 1} onClick={() => setPageNumber((p) => p - 1)}>
+          <button type="button" className="btn btn-sm" disabled={pageNumber <= 1} onClick={() => setPageNumber((p) => p - 1)}>
             Previous
           </button>
-          <span>
+          <span className="text-sm">
             Page {data.pageNumber} of {data.totalPages}
           </span>
-          <button type="button" disabled={pageNumber >= data.totalPages} onClick={() => setPageNumber((p) => p + 1)}>
+          <button
+            type="button"
+            className="btn btn-sm"
+            disabled={pageNumber >= data.totalPages}
+            onClick={() => setPageNumber((p) => p + 1)}
+          >
             Next
           </button>
         </div>
       )}
 
-      {!user && <p>Log in to write a review.</p>}
+      {!user && <p className="text-sm text-muted">Log in to write a review.</p>}
 
       {user && myReview && !isEditing && (
         <div>
-          <p>You've already reviewed this car.</p>
+          <p className="text-sm text-muted">You've already reviewed this car.</p>
           <div className="reservation-actions">
-            <button type="button" onClick={() => setIsEditing(true)}>
+            <button type="button" className="btn btn-sm" onClick={() => setIsEditing(true)}>
               Edit your review
             </button>
             <button
               type="button"
+              className="btn btn-sm btn-danger"
               onClick={() => deleteReview({ id: myReview.id, carId })}
               disabled={isDeleting}
             >
@@ -142,7 +154,7 @@ export default function CarReviews({ carId }: { carId: number }) {
       {user && !myReview && hasReturnedThisCar && <ReviewForm carId={carId} />}
 
       {user && !myReview && !hasReturnedThisCar && (
-        <p>You can review this car once you've rented and returned it.</p>
+        <p className="text-sm text-muted">You can review this car once you've rented and returned it.</p>
       )}
     </div>
   );
