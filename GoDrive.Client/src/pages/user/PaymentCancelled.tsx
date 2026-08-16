@@ -8,12 +8,15 @@ export default function PaymentCancelled() {
   }, []);
 
   return (
-    <div>
+    <div className="hero">
+      <span className="badge badge-neutral" style={{ marginBottom: "var(--space-3)" }}>
+        Cancelled
+      </span>
       <h1>Payment cancelled</h1>
-      <p>You can try again any time from your reservation.</p>
-      <p>
-        <Link to="/reservations">Go to My Reservations</Link>
-      </p>
+      <p className="hero-subtitle">You can try again any time from your reservation.</p>
+      <Link to="/reservations" className="btn btn-primary">
+        Go to My Reservations
+      </Link>
     </div>
   );
 }

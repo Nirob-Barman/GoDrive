@@ -32,41 +32,51 @@ export default function PaymentReturn() {
 
   if (reservationId === null) {
     return (
-      <div>
+      <div className="hero">
         <h1>Payment</h1>
-        <p>We couldn't determine which reservation this payment was for.</p>
-        <p>
-          <Link to="/reservations">Go to My Reservations</Link>
-        </p>
+        <p className="hero-subtitle">We couldn't determine which reservation this payment was for.</p>
+        <Link to="/reservations" className="btn btn-primary">
+          Go to My Reservations
+        </Link>
       </div>
     );
   }
 
   if (isLoading) {
-    return <p>Checking payment status...</p>;
+    return (
+      <div className="hero">
+        <h1>Checking payment status...</h1>
+      </div>
+    );
   }
 
   if (isPaid) {
     return (
-      <div>
+      <div className="hero">
+        <span className="badge badge-success" style={{ marginBottom: "var(--space-3)" }}>
+          Paid
+        </span>
         <h1>Payment successful</h1>
-        <p>Your payment for {reservation!.carName} has been confirmed.</p>
-        <p>
-          <Link to="/reservations">Go to My Reservations</Link>
-        </p>
+        <p className="hero-subtitle">Your payment for {reservation!.carName} has been confirmed.</p>
+        <Link to="/reservations" className="btn btn-primary">
+          Go to My Reservations
+        </Link>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="hero">
+      <span className="badge badge-warning" style={{ marginBottom: "var(--space-3)" }}>
+        Confirming
+      </span>
       <h1>Confirming payment...</h1>
-      <p>
+      <p className="hero-subtitle">
         Stripe confirms payments asynchronously - this can take a few moments. This page will
         update automatically once it's confirmed.
       </p>
       {!pollingActive && (
-        <p>
+        <p className="text-sm text-muted">
           Still not confirmed after a while - if you completed payment on Stripe's page, check{" "}
           <Link to="/reservations">My Reservations</Link> shortly; it will update once the
           confirmation arrives.
