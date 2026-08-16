@@ -8,6 +8,7 @@ import {
   useGetCarByIdQuery,
   useUpdateCarMutation,
 } from "../../redux/features/cars/carsApi";
+import PageHeader from "../../components/ui/PageHeader";
 import type { TCarStatus, TCarType, TFuelType, TTransmissionType } from "../../types/cars";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 
@@ -130,118 +131,140 @@ export default function CarForm() {
   }
 
   return (
-    <div className="auth-form">
-      <h1>{isEditMode ? "Edit Car" : "Add Car"}</h1>
+    <div>
+      <PageHeader title={isEditMode ? "Edit Car" : "Add Car"} />
 
-      <form onSubmit={handleSubmit}>
-        <label>
-          Name
-          <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-        </label>
-        <label>
-          Brand
-          <input type="text" value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} required />
-        </label>
-        <label>
-          Model
-          <input type="text" value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} required />
-        </label>
-        <label>
-          Year
-          <input type="number" value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })} required />
-        </label>
-        <label>
-          Description
-          <textarea
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-            rows={3}
-          />
-        </label>
-        <label>
-          Car type
-          <select value={form.carType} onChange={(e) => setForm({ ...form, carType: e.target.value as TCarType })}>
-            {CAR_TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Fuel type
-          <select value={form.fuelType} onChange={(e) => setForm({ ...form, fuelType: e.target.value as TFuelType })}>
-            {FUEL_TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Transmission
-          <select
-            value={form.transmission}
-            onChange={(e) => setForm({ ...form, transmission: e.target.value as TTransmissionType })}
-          >
-            {TRANSMISSIONS.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Seats
-          <input type="number" value={form.seats} onChange={(e) => setForm({ ...form, seats: e.target.value })} required />
-        </label>
-        <label>
-          Price per hour
-          <input
-            type="number"
-            step="0.01"
-            value={form.pricePerHour}
-            onChange={(e) => setForm({ ...form, pricePerHour: e.target.value })}
-            required
-          />
-        </label>
-        <label>
-          Location
-          <input type="text" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} required />
-        </label>
+      <form onSubmit={handleSubmit} style={{ maxWidth: "640px" }}>
+        <div className="form-section">
+          <h2>Basic Information</h2>
+          <div className="field-group">
+            <label>
+              Name
+              <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+            </label>
+            <label>
+              Brand
+              <input type="text" value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} required />
+            </label>
+            <label>
+              Model
+              <input type="text" value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} required />
+            </label>
+            <label>
+              Year
+              <input type="number" value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })} required />
+            </label>
+            <label>
+              Description
+              <textarea
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+                rows={3}
+              />
+            </label>
+          </div>
+        </div>
+
+        <div className="form-section">
+          <h2>Vehicle Specifications</h2>
+          <div className="field-group">
+            <label>
+              Car type
+              <select value={form.carType} onChange={(e) => setForm({ ...form, carType: e.target.value as TCarType })}>
+                {CAR_TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Fuel type
+              <select value={form.fuelType} onChange={(e) => setForm({ ...form, fuelType: e.target.value as TFuelType })}>
+                {FUEL_TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Transmission
+              <select
+                value={form.transmission}
+                onChange={(e) => setForm({ ...form, transmission: e.target.value as TTransmissionType })}
+              >
+                {TRANSMISSIONS.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Seats
+              <input type="number" value={form.seats} onChange={(e) => setForm({ ...form, seats: e.target.value })} required />
+            </label>
+          </div>
+        </div>
+
+        <div className="form-section">
+          <h2>Rental Information</h2>
+          <div className="field-group">
+            <label>
+              Price per hour
+              <input
+                type="number"
+                step="0.01"
+                value={form.pricePerHour}
+                onChange={(e) => setForm({ ...form, pricePerHour: e.target.value })}
+                required
+              />
+            </label>
+            <label>
+              Location
+              <input type="text" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} required />
+            </label>
+          </div>
+        </div>
 
         {isEditMode && (
-          <label>
-            Status
-            <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value as TCarStatus })}>
-              {STATUSES.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </label>
+          <div className="form-section">
+            <h2>Status</h2>
+            <div className="field-group">
+              <label>
+                Availability status
+                <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value as TCarStatus })}>
+                  {STATUSES.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </div>
         )}
 
         {error && <p className="form-error">{getErrorMessage(error)}</p>}
-        {saved && <p>Saved.</p>}
+        {saved && <p className="form-success">Saved.</p>}
 
-        <button type="submit" disabled={isCreating || isUpdating}>
+        <button type="submit" className="btn btn-primary" disabled={isCreating || isUpdating}>
           {isCreating || isUpdating ? "Saving..." : isEditMode ? "Save Changes" : "Create Car"}
         </button>
       </form>
 
       {isEditMode && car && (
-        <div className="car-reviews">
+        <div className="form-section" style={{ maxWidth: "640px", marginTop: "24px" }}>
           <h2>Images</h2>
 
-          {car.images.length === 0 && <p>No images yet.</p>}
+          {car.images.length === 0 && <p className="text-sm text-muted">No images yet.</p>}
 
           <div className="car-image-manager">
             {car.images.map((image) => (
               <div key={image.id} className="car-image-manager-item">
                 <img src={image.url} alt="" />
-                <button type="button" onClick={() => deleteCarImage({ carId, imageId: image.id })}>
+                <button type="button" className="btn btn-sm btn-danger" onClick={() => deleteCarImage({ carId, imageId: image.id })}>
                   Remove
                 </button>
               </div>
@@ -250,7 +273,7 @@ export default function CarForm() {
 
           <div className="car-image-upload">
             <input ref={fileInputRef} type="file" accept="image/*" multiple />
-            <button type="button" onClick={handleAddImages} disabled={isUploading}>
+            <button type="button" className="btn" onClick={handleAddImages} disabled={isUploading}>
               {isUploading ? "Uploading..." : "Upload Images"}
             </button>
           </div>
