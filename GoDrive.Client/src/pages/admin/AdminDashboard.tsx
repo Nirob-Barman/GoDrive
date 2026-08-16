@@ -4,9 +4,18 @@ import {
   useGetDashboardStatisticsQuery,
   useGetRevenueByPeriodQuery,
 } from "../../redux/features/dashboard/dashboardApi";
+import PageHeader from "../../components/ui/PageHeader";
+import EmptyState from "../../components/ui/EmptyState";
+import Skeleton, { SkeletonRows } from "../../components/ui/Skeleton";
 import type { TRevenuePeriod } from "../../types/dashboard";
 
 const PERIODS: TRevenuePeriod[] = ["Daily", "Weekly", "Monthly", "Yearly"];
+
+function utilizationLevel(percent: number): "high" | "medium" | "low" {
+  if (percent >= 60) return "high";
+  if (percent >= 25) return "medium";
+  return "low";
+}
 
 export default function AdminDashboard() {
   const [period, setPeriod] = useState<TRevenuePeriod>("Monthly");
@@ -25,9 +34,15 @@ export default function AdminDashboard() {
 
   return (
     <div>
-      <h1>Dashboard</h1>
+      <PageHeader title="Dashboard" subtitle="Fleet, bookings, and revenue at a glance." />
 
-      {isLoadingStats && <p>Loading statistics...</p>}
+      {isLoadingStats && (
+        <div className="stat-grid">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} height={88} />
+          ))}
+        </div>
+      )}
       {statsError && <p className="form-error">Could not load statistics.</p>}
       {stats && (
         <div className="stat-grid">
@@ -58,67 +73,84 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      <h2>Revenue</h2>
-      <select value={period} onChange={(e) => setPeriod(e.target.value as TRevenuePeriod)}>
-        {PERIODS.map((p) => (
-          <option key={p} value={p}>
-            {p}
-          </option>
-        ))}
-      </select>
+      <div className="form-section">
+        <h2>Revenue</h2>
+        <select value={period} onChange={(e) => setPeriod(e.target.value as TRevenuePeriod)}>
+          {PERIODS.map((p) => (
+            <option key={p} value={p}>
+              {p}
+            </option>
+          ))}
+        </select>
 
-      {isLoadingRevenue && <p>Loading revenue...</p>}
-      {revenueError && <p className="form-error">Could not load revenue.</p>}
-      {revenue && revenue.length === 0 && <p>No revenue in this period.</p>}
-      {revenue && revenue.length > 0 && (
-        <div className="table-wrapper">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Period</th>
-                <th>Revenue</th>
-              </tr>
-            </thead>
-            <tbody>
-              {revenue.map((point) => (
-                <tr key={point.periodStart}>
-                  <td>{new Date(point.periodStart).toLocaleDateString()}</td>
-                  <td>${point.revenue.toFixed(2)}</td>
+        {isLoadingRevenue && <SkeletonRows count={3} />}
+        {revenueError && <p className="form-error">Could not load revenue.</p>}
+        {revenue && revenue.length === 0 && <EmptyState title="No revenue in this period" />}
+        {revenue && revenue.length > 0 && (
+          <div className="table-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Period</th>
+                  <th>Revenue</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              </thead>
+              <tbody>
+                {revenue.map((point) => (
+                  <tr key={point.periodStart}>
+                    <td>{new Date(point.periodStart).toLocaleDateString()}</td>
+                    <td>${point.revenue.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
-      <h2>Car Utilization (last 30 days)</h2>
-      {isLoadingUtilization && <p>Loading utilization...</p>}
-      {utilizationError && <p className="form-error">Could not load car utilization.</p>}
-      {utilization && utilization.length === 0 && <p>No data yet.</p>}
-      {utilization && utilization.length > 0 && (
-        <div className="table-wrapper">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Car</th>
-                <th>Bookings</th>
-                <th>Booked Hours</th>
-                <th>Utilization</th>
-              </tr>
-            </thead>
-            <tbody>
-              {utilization.map((row) => (
-                <tr key={row.carId}>
-                  <td>{row.carName}</td>
-                  <td>{row.confirmedBookings}</td>
-                  <td>{row.bookedHours}</td>
-                  <td>{row.utilizationRatePercent.toFixed(1)}%</td>
+      <div className="form-section">
+        <h2>Car Utilization (last 30 days)</h2>
+        {isLoadingUtilization && <SkeletonRows count={3} />}
+        {utilizationError && <p className="form-error">Could not load car utilization.</p>}
+        {utilization && utilization.length === 0 && <EmptyState title="No utilization data yet" />}
+        {utilization && utilization.length > 0 && (
+          <div className="table-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Car</th>
+                  <th>Bookings</th>
+                  <th>Booked Hours</th>
+                  <th>Utilization</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              </thead>
+              <tbody>
+                {utilization.map((row) => {
+                  const level = utilizationLevel(row.utilizationRatePercent);
+                  return (
+                    <tr key={row.carId}>
+                      <td>{row.carName}</td>
+                      <td>{row.confirmedBookings}</td>
+                      <td>{row.bookedHours}</td>
+                      <td>
+                        <div className="utilization-bar-wrap">
+                          <div className="utilization-bar-track">
+                            <div
+                              className={`utilization-bar-fill utilization-bar-fill-${level}`}
+                              style={{ width: `${Math.min(100, row.utilizationRatePercent)}%` }}
+                            />
+                          </div>
+                          <span className="utilization-bar-label">{row.utilizationRatePercent.toFixed(1)}%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
