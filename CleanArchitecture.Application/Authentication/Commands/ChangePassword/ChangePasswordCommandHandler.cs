@@ -32,8 +32,10 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
         }
 
         // Changing the password invalidates every other session - force re-login elsewhere.
+        // The caller's own current session is spared: they just proved they know the
+        // (new) password, so there's no security reason to log this device out too.
         var activeTokens = await _context.RefreshTokens
-            .Where(rt => rt.UserId == userId && rt.RevokedAtUtc == null)
+            .Where(rt => rt.UserId == userId && rt.RevokedAtUtc == null && rt.Token != request.CurrentRefreshToken)
             .ToListAsync(cancellationToken);
 
         foreach (var token in activeTokens)

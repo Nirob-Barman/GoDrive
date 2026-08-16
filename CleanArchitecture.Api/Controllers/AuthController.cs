@@ -1,4 +1,5 @@
 using CleanArchitecture.Api.Common;
+using CleanArchitecture.Api.Controllers.Requests;
 using CleanArchitecture.Api.Controllers.Responses;
 using CleanArchitecture.Application.Authentication.Commands.ChangePassword;
 using CleanArchitecture.Application.Authentication.Commands.ForgotPassword;
@@ -74,8 +75,13 @@ public class AuthController : ControllerBase
 
     [Authorize]
     [HttpPost("change-password")]
-    public async Task<IActionResult> ChangePassword(ChangePasswordCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> ChangePassword(ChangePasswordRequest request, CancellationToken cancellationToken)
     {
+        Request.Cookies.TryGetValue(RefreshTokenCookieName, out var currentRefreshToken);
+
+        var command = new ChangePasswordCommand(
+            request.CurrentPassword, request.NewPassword, request.ConfirmNewPassword, currentRefreshToken);
+
         await _sender.Send(command, cancellationToken);
         return Ok(ApiResponse.Ok("Password changed. You have been logged out of all other sessions."));
     }

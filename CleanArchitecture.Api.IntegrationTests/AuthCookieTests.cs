@@ -1,5 +1,7 @@
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 using FluentAssertions;
 
 namespace CleanArchitecture.Api.IntegrationTests;
@@ -89,6 +91,50 @@ public class AuthCookieTests : IntegrationTestBase
         var response = await client.PostAsync("/api/auth/refresh-token", null);
 
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task Change_password_spares_the_calling_sessions_own_refresh_token_but_revokes_other_sessions()
+    {
+        var client = ClientWithoutCookieHandling();
+        var email = "cookie-changepw@test.com";
+        await RegisterAsync(client, email);
+
+        // Two logins simulate two devices/sessions - each gets its own refresh-token cookie.
+        var firstLoginResponse = await client.PostAsJsonAsync("/api/auth/login", new { email, password = "Passw0rd!" });
+        var firstLoginJson = await ReadDataAsync<JsonElement>(firstLoginResponse);
+        var firstAccessToken = firstLoginJson.GetProperty("token").GetString();
+        var firstRefreshCookie = ExtractCookieValue(firstLoginResponse, "refreshToken");
+
+        var secondLoginResponse = await client.PostAsJsonAsync("/api/auth/login", new { email, password = "Passw0rd!" });
+        var secondRefreshCookie = ExtractCookieValue(secondLoginResponse, "refreshToken");
+
+        // Change password from the FIRST session (its access token + its own refresh cookie attached).
+        var changePasswordRequest = new HttpRequestMessage(HttpMethod.Post, "/api/auth/change-password")
+        {
+            Content = JsonContent.Create(new
+            {
+                currentPassword = "Passw0rd!",
+                newPassword = "NewPassw0rd!",
+                confirmNewPassword = "NewPassw0rd!",
+            }),
+        };
+        changePasswordRequest.Headers.Add("Cookie", $"refreshToken={firstRefreshCookie}");
+        changePasswordRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", firstAccessToken);
+        var changePasswordResponse = await client.SendAsync(changePasswordRequest);
+        changePasswordResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        // The FIRST session's own refresh token still works.
+        var firstRefreshRequest = new HttpRequestMessage(HttpMethod.Post, "/api/auth/refresh-token");
+        firstRefreshRequest.Headers.Add("Cookie", $"refreshToken={firstRefreshCookie}");
+        var firstRefreshResponse = await client.SendAsync(firstRefreshRequest);
+        firstRefreshResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        // The SECOND session's refresh token was revoked.
+        var secondRefreshRequest = new HttpRequestMessage(HttpMethod.Post, "/api/auth/refresh-token");
+        secondRefreshRequest.Headers.Add("Cookie", $"refreshToken={secondRefreshCookie}");
+        var secondRefreshResponse = await client.SendAsync(secondRefreshRequest);
+        secondRefreshResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
     [Fact]
