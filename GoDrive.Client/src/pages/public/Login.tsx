@@ -54,15 +54,15 @@ export default function Login() {
 
         {error && <p className="form-error">{getErrorMessage(error)}</p>}
 
-        <button type="submit" disabled={isLoading}>
+        <button type="submit" className="btn btn-primary" disabled={isLoading}>
           {isLoading ? "Logging in..." : "Log in"}
         </button>
       </form>
 
-      <p>
+      <p className="text-sm text-muted">
         Don't have an account? <Link to="/register">Sign up</Link>
       </p>
-      <p>
+      <p className="text-sm text-muted">
         <Link to="/forgot-password">Forgot password?</Link>
       </p>
     </div>

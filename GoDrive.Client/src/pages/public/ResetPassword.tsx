@@ -61,12 +61,12 @@ export default function ResetPassword() {
 
         {error && <p className="form-error">{getErrorMessage(error)}</p>}
 
-        <button type="submit" disabled={isLoading}>
+        <button type="submit" className="btn btn-primary" disabled={isLoading}>
           {isLoading ? "Resetting..." : "Reset Password"}
         </button>
       </form>
 
-      <p>
+      <p className="text-sm text-muted">
         <Link to="/login">Back to log in</Link>
       </p>
     </div>

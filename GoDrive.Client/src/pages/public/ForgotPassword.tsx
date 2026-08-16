@@ -18,7 +18,7 @@ export default function ForgotPassword() {
       <h1>Forgot Password</h1>
 
       {message ? (
-        <p>{message}</p>
+        <p className="form-success">{message}</p>
       ) : (
         <form onSubmit={handleSubmit}>
           <label>
@@ -28,13 +28,13 @@ export default function ForgotPassword() {
 
           {error && <p className="form-error">{getErrorMessage(error)}</p>}
 
-          <button type="submit" disabled={isLoading}>
+          <button type="submit" className="btn btn-primary" disabled={isLoading}>
             {isLoading ? "Sending..." : "Send reset link"}
           </button>
         </form>
       )}
 
-      <p>
+      <p className="text-sm text-muted">
         <Link to="/login">Back to log in</Link>
       </p>
     </div>

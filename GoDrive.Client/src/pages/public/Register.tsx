@@ -78,12 +78,12 @@ export default function Register() {
 
         {error && <p className="form-error">{getErrorMessage(error)}</p>}
 
-        <button type="submit" disabled={isLoading}>
+        <button type="submit" className="btn btn-primary" disabled={isLoading}>
           {isLoading ? "Signing up..." : "Sign up"}
         </button>
       </form>
 
-      <p>
+      <p className="text-sm text-muted">
         Already have an account? <Link to="/login">Log in</Link>
       </p>
     </div>
