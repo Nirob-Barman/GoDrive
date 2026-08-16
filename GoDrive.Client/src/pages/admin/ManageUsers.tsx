@@ -7,6 +7,10 @@ import {
 } from "../../redux/features/users/adminUsersApi";
 import { useAppSelector } from "../../redux/hooks";
 import { selectCurrentUser } from "../../redux/features/auth/authSlice";
+import { ActiveStatusBadge, RoleBadge } from "../../components/ui/StatusBadge";
+import PageHeader from "../../components/ui/PageHeader";
+import EmptyState from "../../components/ui/EmptyState";
+import { SkeletonRows } from "../../components/ui/Skeleton";
 import type { TUserSummary } from "../../types/users";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 
@@ -20,18 +24,20 @@ function UserRow({ user, isSelf }: { user: TUserSummary; isSelf: boolean }) {
     <li className="reservation-row">
       <div>
         <h2>{user.fullName}</h2>
-        <p>
+        <p className="text-sm text-muted">
           {user.email} &middot; {user.phoneNumber ?? "No phone"}
         </p>
-        <p>
-          {user.role} &middot; {user.isActive ? "Active" : "Blocked"}
-        </p>
+        <div className="reservation-meta-row">
+          <RoleBadge role={user.role} />
+          <ActiveStatusBadge isActive={user.isActive} />
+        </div>
         {error && <p className="form-error">{getErrorMessage(error)}</p>}
       </div>
 
       <div className="reservation-actions">
         <button
           type="button"
+          className={`btn btn-sm${user.isActive ? " btn-danger" : ""}`}
           onClick={() => setActiveStatus({ userId: user.userId, isActive: !user.isActive })}
           disabled={isTogglingActive}
         >
@@ -39,6 +45,7 @@ function UserRow({ user, isSelf }: { user: TUserSummary; isSelf: boolean }) {
         </button>
         <button
           type="button"
+          className="btn btn-sm"
           onClick={() => changeRole({ userId: user.userId, role: user.role === "Admin" ? "User" : "Admin" })}
           disabled={isChangingRole || isSelf}
           title={isSelf ? "You cannot change your own role" : undefined}
@@ -72,9 +79,9 @@ export default function ManageUsers() {
 
   return (
     <div>
-      <h1>Manage Users</h1>
+      <PageHeader title="Manage Users" subtitle="Search, block/activate accounts, and change roles." />
 
-      <form className="car-filters" onSubmit={handleSearchSubmit}>
+      <form className="admin-filter-bar" onSubmit={handleSearchSubmit}>
         <input placeholder="Search name or email" value={search} onChange={(e) => setSearch(e.target.value)} />
         <select
           value={isActiveFilter}
@@ -87,29 +94,39 @@ export default function ManageUsers() {
           <option value="true">Active</option>
           <option value="false">Blocked</option>
         </select>
-        <button type="submit">Search</button>
+        <button type="submit" className="btn">
+          Search
+        </button>
       </form>
 
-      {isLoading && <p>Loading users...</p>}
+      {isLoading && <SkeletonRows count={4} />}
 
-      <ul className="reservation-list">
-        {data?.items.map((user) => (
-          <UserRow key={user.userId} user={user} isSelf={user.userId === currentUser?.userId} />
-        ))}
-      </ul>
+      {data && data.items.length === 0 && <EmptyState title="No users match this filter" />}
 
-      {data && data.items.length === 0 && <p>No users match this filter.</p>}
+      {data && data.items.length > 0 && (
+        <ul className="reservation-list">
+          {data.items.map((user) => (
+            <UserRow key={user.userId} user={user} isSelf={user.userId === currentUser?.userId} />
+          ))}
+        </ul>
+      )}
 
       {data && data.totalPages > 1 && (
         <div className="pagination">
-          <button type="button" disabled={pageNumber <= 1 || isFetching} onClick={() => setPageNumber((p) => p - 1)}>
+          <button
+            type="button"
+            className="btn btn-sm"
+            disabled={pageNumber <= 1 || isFetching}
+            onClick={() => setPageNumber((p) => p - 1)}
+          >
             Previous
           </button>
-          <span>
+          <span className="text-sm">
             Page {data.pageNumber} of {data.totalPages}
           </span>
           <button
             type="button"
+            className="btn btn-sm"
             disabled={pageNumber >= data.totalPages || isFetching}
             onClick={() => setPageNumber((p) => p + 1)}
           >
