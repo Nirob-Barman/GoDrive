@@ -3,12 +3,21 @@ using CleanArchitecture.Api.Common;
 using CleanArchitecture.Application;
 using CleanArchitecture.Infrastructure;
 using CleanArchitecture.Infrastructure.Persistence.Seed;
+using Serilog;
 
 // Load .env (searching this and parent directories) before configuration is built,
 // so its values are already process environment variables when AddEnvironmentVariables() runs.
 DotNetEnv.Env.TraversePath().Load();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext();
+});
 
 // Add services to the container.
 
