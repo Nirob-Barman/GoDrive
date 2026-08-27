@@ -24,9 +24,10 @@ public static class DependencyInjection
         // appsettings.json since that file is fully git-ignored in this repo with no committed template.
         // AllowCredentials is required so the browser sends/receives the httpOnly refresh-token cookie;
         // it cannot be combined with AllowAnyOrigin, which is why a single explicit origin is required here.
-        var allowedOrigin = configuration["Cors:AllowedOrigin"] ?? "http://localhost:5173";
+        //var allowedOrigin = configuration["Cors:AllowedOrigin"] ?? "http://localhost:5173";
+        var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? ["http://localhost:5173"];
         services.AddCors(options => options.AddPolicy(CorsPolicies.WebClient, policy => policy
-            .WithOrigins(allowedOrigin)
+            .WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials()));
