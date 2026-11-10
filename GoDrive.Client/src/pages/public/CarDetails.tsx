@@ -38,12 +38,15 @@ export default function CarDetails() {
         <span className="text-sm font-bold tracking-[3px] text-orange-500">
           VEHICLE NOT FOUND
         </span>
+
         <h1 className="mt-4 text-3xl font-bold text-gray-900 dark:text-white">
           This ride isn't available.
         </h1>
-        <p className="mt-3 max-w-md text-sm leading-7 text-gray-500">
+
+        <p className="mt-3 max-w-md text-sm leading-7 text-gray-500 dark:text-gray-400">
           The vehicle may have been removed or the link might be incorrect.
         </p>
+
         <Link
           to="/cars"
           className="mt-7 rounded-xl bg-orange-500 px-6 py-3 text-sm font-bold text-white transition hover:bg-orange-600"
@@ -76,14 +79,18 @@ export default function CarDetails() {
           >
             Home
           </Link>
+
           <span className="text-gray-300">/</span>
+
           <Link
             to="/cars"
             className="text-gray-400 transition hover:text-orange-500"
           >
             Browse cars
           </Link>
+
           <span className="text-gray-300">/</span>
+
           <span className="font-semibold text-gray-800 dark:text-gray-200">
             {car.name}
           </span>
@@ -95,9 +102,11 @@ export default function CarDetails() {
             <span className="text-xs font-extrabold tracking-[3px] text-orange-500">
               DISCOVER YOUR NEXT RIDE
             </span>
+
             <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-gray-950 sm:text-4xl dark:text-white">
               {car.name}
             </h1>
+
             <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
               {car.brand} {car.model} · {car.year} · {car.carType}
             </p>
@@ -105,6 +114,7 @@ export default function CarDetails() {
 
           <div className="flex items-center gap-3">
             <CarStatusBadge status={car.status} />
+
             {car.averageRating !== null && (
               <span className="flex items-center gap-1 text-sm font-bold text-gray-700 dark:text-gray-200">
                 <span className="text-lg text-amber-500">★</span>
@@ -175,6 +185,7 @@ export default function CarDetails() {
                 <span className="text-xs font-bold tracking-[2px] text-orange-500">
                   ABOUT THE VEHICLE
                 </span>
+
                 <h2 className="mt-2 text-2xl font-bold text-gray-950 dark:text-white">
                   Experience the ride
                 </h2>
@@ -191,6 +202,7 @@ export default function CarDetails() {
               <span className="text-xs font-bold tracking-[2px] text-orange-500">
                 VEHICLE INFORMATION
               </span>
+
               <h2 className="mt-2 text-2xl font-bold text-gray-950 dark:text-white">
                 Vehicle specifications
               </h2>
@@ -204,7 +216,9 @@ export default function CarDetails() {
                     <span className="text-2xl text-orange-500">
                       {spec.icon}
                     </span>
+
                     <p className="mt-4 text-xs text-gray-400">{spec.label}</p>
+
                     <p className="mt-1 text-sm font-bold text-gray-900 dark:text-white">
                       {spec.value}
                     </p>
@@ -219,8 +233,10 @@ export default function CarDetails() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-50 text-xl text-orange-500 dark:bg-orange-500/10">
                   📍
                 </div>
+
                 <div>
                   <p className="text-xs text-gray-400">Vehicle location</p>
+
                   <p className="mt-1 font-bold text-gray-900 dark:text-white">
                     {car.location}
                   </p>
@@ -237,6 +253,7 @@ export default function CarDetails() {
           {/* Booking Card */}
           <aside className="lg:sticky lg:top-24">
             <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+              {/* Price Header */}
               <div className="bg-gray-950 p-7 text-white">
                 <span className="text-xs font-bold tracking-[2px] text-orange-400">
                   YOUR NEXT JOURNEY
@@ -246,6 +263,7 @@ export default function CarDetails() {
                   <span className="text-4xl font-extrabold">
                     ${car.pricePerHour.toFixed(2)}
                   </span>
+
                   <span className="pb-1 text-sm text-gray-400">/ hour</span>
                 </div>
 
@@ -254,9 +272,11 @@ export default function CarDetails() {
                 </p>
               </div>
 
+              {/* Booking Details */}
               <div className="space-y-5 p-6">
                 <div className="flex items-center justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
                   <span className="text-sm text-gray-500">Vehicle</span>
+
                   <span className="text-sm font-bold text-gray-900 dark:text-white">
                     {car.name}
                   </span>
@@ -264,6 +284,7 @@ export default function CarDetails() {
 
                 <div className="flex items-center justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
                   <span className="text-sm text-gray-500">Location</span>
+
                   <span className="max-w-[160px] text-right text-sm font-semibold text-gray-900 dark:text-white">
                     {car.location}
                   </span>
@@ -271,10 +292,11 @@ export default function CarDetails() {
 
                 <div className="flex items-center justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
                   <span className="text-sm text-gray-500">Availability</span>
+
                   <CarStatusBadge status={car.status} />
                 </div>
 
-                {car.status === "Available" ? (
+                {car.status === "Active" ? (
                   user ? (
                     <Link
                       to={`/book/${car.id}`}
