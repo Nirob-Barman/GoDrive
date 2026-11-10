@@ -2,6 +2,7 @@ using CleanArchitecture.Api;
 using CleanArchitecture.Api.Common;
 using CleanArchitecture.Application;
 using CleanArchitecture.Infrastructure;
+using CleanArchitecture.Infrastructure.Persistence;
 using CleanArchitecture.Infrastructure.Persistence.Seed;
 using Serilog;
 
@@ -32,6 +33,8 @@ using (var scope = app.Services.CreateScope())
     try
     {
         await IdentitySeeder.SeedAsync(scope.ServiceProvider);
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        await CarSeeder.SeedAsync(context);
     }
     catch (Exception ex)
     {
