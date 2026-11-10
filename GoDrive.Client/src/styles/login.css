@@ -1,0 +1,486 @@
+
+/* =========================================
+   GoDrive - Login Page
+   Premium Automotive Design
+========================================= */
+
+/* Main Layout */
+
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #ffffff;
+}
+
+/* =========================================
+   Left Visual Section
+========================================= */
+
+.login-visual {
+  min-height: 100vh;
+  padding: 48px 9%;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(15, 18, 25, 0.88),
+      rgba(15, 18, 25, 0.52)
+    ),
+    url("https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1600&q=85")
+      center / cover no-repeat;
+
+  color: #ffffff;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  position: relative;
+  overflow: hidden;
+}
+
+/* Brand */
+
+.login-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+
+  width: fit-content;
+
+  color: #ffffff;
+  text-decoration: none;
+
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: -0.7px;
+}
+
+.login-brand-icon {
+  display: grid;
+  place-items: center;
+
+  width: 42px;
+  height: 42px;
+
+  border-radius: 12px;
+
+  background: #ff713d;
+  color: #ffffff;
+
+  font-size: 22px;
+  font-weight: 800;
+}
+
+/* Visual Content */
+
+.login-visual-content {
+  max-width: 490px;
+  position: relative;
+  z-index: 1;
+}
+
+.login-eyebrow,
+.login-welcome {
+  color: #ff713d;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  letter-spacing: 2px;
+}
+
+.login-visual-content h1 {
+  color: #ffffff;
+
+  font-size: clamp(42px, 5vw, 68px);
+  line-height: 1.08;
+
+  letter-spacing: -2px;
+
+  margin: 20px 0;
+}
+
+.login-visual-content p {
+  max-width: 390px;
+
+  color: #d0d2d8;
+
+  line-height: 1.8;
+  font-size: 16px;
+}
+
+/* Visual Footer */
+
+.login-visual-footer {
+  color: #a5a8b1;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+}
+
+/* =========================================
+   Right Login Section
+========================================= */
+
+.login-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 48px 8%;
+  background: #ffffff;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 430px;
+}
+
+/* Heading */
+
+.login-heading {
+  margin-bottom: 36px;
+}
+
+.login-heading h2 {
+  font-size: 32px;
+  font-weight: 800;
+
+  letter-spacing: -1px;
+
+  margin: 12px 0;
+
+  color: #171a21;
+}
+
+.login-heading p {
+  color: #858995;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* =========================================
+   Login Form
+========================================= */
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.login-form label,
+.login-password-label label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #292d36;
+}
+
+/* Input Fields */
+
+.login-form input {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 15px 16px;
+
+  border: 1px solid #e3e5e9;
+  border-radius: 10px;
+
+  background: #ffffff;
+  color: #171a21;
+
+  outline: none;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.login-form input::placeholder {
+  color: #a5a8b1;
+}
+
+.login-form input:hover {
+  border-color: #c9cbd1;
+}
+
+.login-form input:focus,
+.login-form input:focus-visible {
+  border-color: #ff713d;
+
+  box-shadow:
+    0 0 0 4px rgba(255, 113, 61, 0.12);
+
+  outline: none;
+}
+
+/* Password Label */
+
+.login-password-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-top: 10px;
+}
+
+.login-password-label a,
+.login-register a {
+  color: #f26532;
+
+  font-weight: 600;
+  text-decoration: none;
+
+  transition: color 0.2s ease;
+}
+
+.login-password-label a {
+  font-size: 12px;
+}
+
+.login-password-label a:hover,
+.login-register a:hover {
+  color: #d94f22;
+  text-decoration: underline;
+}
+
+/* =========================================
+   Error Message
+========================================= */
+
+.login-error {
+  margin: 4px 0;
+
+  padding: 12px 14px;
+
+  border: 1px solid #fecaca;
+  border-radius: 9px;
+
+  background: #fef2f2;
+  color: #b91c1c;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* =========================================
+   Submit Button
+========================================= */
+
+.login-submit {
+  width: 100%;
+  min-height: 52px;
+
+  margin-top: 14px;
+  padding: 14px 20px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #ff713d;
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.login-submit:hover:not(:disabled) {
+  background: #e95b2b;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 6px 18px rgba(255, 113, 61, 0.22);
+}
+
+.login-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.login-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   Register Link
+========================================= */
+
+.login-register {
+  margin-top: 28px;
+
+  text-align: center;
+
+  color: #858995;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* =========================================
+   Keyboard Accessibility
+========================================= */
+
+.login-brand:focus-visible,
+.login-password-label a:focus-visible,
+.login-register a:focus-visible {
+  outline: 2px solid #ff713d;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.login-submit:focus-visible {
+  outline: 3px solid rgba(255, 113, 61, 0.35);
+  outline-offset: 3px;
+}
+
+/* =========================================
+   Tablet Responsive
+========================================= */
+
+@media (max-width: 1024px) {
+  .login-visual {
+    padding: 40px 7%;
+  }
+
+  .login-content {
+    padding: 40px 7%;
+  }
+
+  .login-visual-content h1 {
+    font-size: 48px;
+  }
+}
+
+/* =========================================
+   Mobile Responsive
+========================================= */
+
+@media (max-width: 768px) {
+  .login-page {
+    grid-template-columns: 1fr;
+    min-height: 100vh;
+  }
+
+  /* Top Visual Section */
+
+  .login-visual {
+    min-height: 280px;
+
+    padding: 26px 7%;
+
+    background-position: center 55%;
+  }
+
+  .login-brand {
+    font-size: 22px;
+  }
+
+  .login-brand-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 20px;
+  }
+
+  .login-visual-content {
+    margin: 45px 0 15px;
+  }
+
+  .login-visual-content h1 {
+    font-size: 38px;
+    letter-spacing: -1.5px;
+    margin: 14px 0;
+  }
+
+  .login-visual-content p,
+  .login-visual-footer {
+    display: none;
+  }
+
+  /* Form Section */
+
+  .login-content {
+    min-height: 450px;
+
+    box-sizing: border-box;
+
+    padding: 45px 7%;
+  }
+
+  .login-card {
+    max-width: 460px;
+  }
+
+  .login-heading {
+    margin-bottom: 28px;
+  }
+
+  .login-heading h2 {
+    font-size: 28px;
+  }
+}
+
+/* =========================================
+   Small Mobile
+========================================= */
+
+@media (max-width: 380px) {
+  .login-visual {
+    min-height: 250px;
+  }
+
+  .login-visual-content h1 {
+    font-size: 33px;
+  }
+
+  .login-heading h2 {
+    font-size: 25px;
+  }
+
+  .login-password-label {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .login-form input {
+    padding: 13px 14px;
+  }
+
+  .login-submit {
+    min-height: 48px;
+  }
+}
+
+/* =========================================
+   Reduced Motion
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .login-form input,
+  .login-submit,
+  .login-password-label a,
+  .login-register a {
+    transition: none;
+  }
+
+  .login-submit:hover:not(:disabled) {
+    transform: none;
+  }
+}
