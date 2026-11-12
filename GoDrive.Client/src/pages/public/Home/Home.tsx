@@ -12,15 +12,23 @@ import LandingFooter from "./components/LandingFooter";
 
 export default function Home() {
   const user = useAppSelector(selectCurrentUser);
-  const { data, isLoading } = useGetCarsQuery({ pageNumber: 1, pageSize: 6 });
+  const { data, isLoading } = useGetCarsQuery({
+    pageNumber: 1,
+    pageSize: 6,
+  });
 
   const featuredCars = data?.items ?? [];
-  const heroImage = featuredCars.find((car) => car.primaryImageUrl)?.primaryImageUrl ?? null;
+
+  const heroImage =
+    featuredCars.find((car) => car.primaryImageUrl)?.primaryImageUrl ?? null;
+
   const darkSectionImage =
-    featuredCars.find((car) => car.primaryImageUrl && car.primaryImageUrl !== heroImage)?.primaryImageUrl ?? null;
+    featuredCars.find(
+      (car) => car.primaryImageUrl && car.primaryImageUrl !== heroImage,
+    )?.primaryImageUrl ?? null;
 
   return (
-    <div className="landing">
+    <main className="mx-auto w-full max-w-[1440px] space-y-20 px-5 py-8 sm:px-8 lg:space-y-24 lg:px-12">
       <HeroSection heroImage={heroImage} />
       <ValueStrip />
       <FeaturedCars cars={featuredCars} isLoading={isLoading} />
@@ -29,6 +37,6 @@ export default function Home() {
       <BenefitsSection />
       <CTASection isAuthenticated={!!user} />
       <LandingFooter isAuthenticated={!!user} />
-    </div>
+    </main>
   );
 }

@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { TCarListItem } from "../types/cars";
 
 export default function CarCard({ car }: { car: TCarListItem }) {
+  const [imageError, setImageError] = useState(false);
+
   return (
     <Link
       to={`/cars/${car.id}`}
@@ -9,16 +12,21 @@ export default function CarCard({ car }: { car: TCarListItem }) {
     >
       {/* Car Image */}
       <div className="relative aspect-[16/10] shrink-0 overflow-hidden bg-gray-100">
-        {car.primaryImageUrl ? (
+        {car.primaryImageUrl && !imageError ? (
           <img
             src={car.primaryImageUrl}
             alt={car.name}
             loading="lazy"
+            decoding="async"
+            onError={() => setImageError(true)}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-sm font-medium text-gray-400">
-            No image available
+          <div className="flex h-full flex-col items-center justify-center gap-2 text-gray-400">
+            <span className="text-3xl" aria-hidden="true">
+              🚗
+            </span>
+            <span className="text-sm font-medium">No image available</span>
           </div>
         )}
 
@@ -66,6 +74,7 @@ export default function CarCard({ car }: { car: TCarListItem }) {
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 strokeWidth="1.8"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -87,6 +96,7 @@ export default function CarCard({ car }: { car: TCarListItem }) {
               viewBox="0 0 24 24"
               stroke="currentColor"
               strokeWidth="1.7"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -108,6 +118,7 @@ export default function CarCard({ car }: { car: TCarListItem }) {
               viewBox="0 0 24 24"
               stroke="currentColor"
               strokeWidth="1.7"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -129,6 +140,7 @@ export default function CarCard({ car }: { car: TCarListItem }) {
               viewBox="0 0 24 24"
               stroke="currentColor"
               strokeWidth="1.7"
+              aria-hidden="true"
             >
               <circle cx="12" cy="12" r="9" />
               <path
@@ -155,6 +167,7 @@ export default function CarCard({ car }: { car: TCarListItem }) {
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 strokeWidth="1.8"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -187,6 +200,7 @@ export default function CarCard({ car }: { car: TCarListItem }) {
               viewBox="0 0 24 24"
               stroke="currentColor"
               strokeWidth="2"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"

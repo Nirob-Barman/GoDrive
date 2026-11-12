@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { logout, selectCurrentUser } from "../redux/features/auth/authSlice";
 import { useLogoutMutation } from "../redux/features/auth/authApi";
@@ -23,7 +24,7 @@ function NavItem({
         `relative flex items-center py-2 text-sm font-semibold transition-colors duration-200 ${
           isActive
             ? "text-orange-500 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:rounded-full after:bg-orange-500"
-            : "text-gray-500 hover:text-orange-500"
+            : "text-gray-600 hover:text-orange-500"
         }`
       }
     >
@@ -36,14 +37,40 @@ export default function Navbar() {
   const user = useAppSelector(selectCurrentUser);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [logoutRequest] = useLogoutMutation();
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const closeMenu = () => setMenuOpen(false);
 
+  // Close mobile navigation after route changes.
+  useEffect(() => {
+    closeMenu();
+  }, [location.pathname]);
+
+  // Close mobile navigation using Escape.
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeMenu();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [menuOpen]);
+
   const handleLogout = async () => {
+    if (isLoggingOut) return;
+
     setIsLoggingOut(true);
 
     try {
@@ -58,13 +85,19 @@ export default function Navbar() {
     }
   };
 
+  const userInitial = user?.fullName?.trim().charAt(0).toUpperCase() || "U";
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/95 shadow-sm backdrop-blur-md">
-      <nav className="mx-auto flex min-h-[76px] max-w-[1440px] items-center justify-between gap-6 px-5 sm:px-8 lg:px-12">
+      <nav
+        aria-label="Main navigation"
+        className="mx-auto flex min-h-[76px] max-w-[1440px] items-center justify-between gap-4 px-5 sm:px-8 lg:px-12"
+      >
         {/* Brand */}
         <NavLink
           to="/"
           onClick={closeMenu}
+          aria-label="GoDrive homepage"
           className="flex shrink-0 items-center gap-3"
         >
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500 text-2xl font-black text-white shadow-lg shadow-orange-500/20">
@@ -77,7 +110,7 @@ export default function Navbar() {
         </NavLink>
 
         {/* Desktop Navigation */}
-        <div className="hidden flex-1 items-center justify-center gap-8 lg:flex">
+        <div className="hidden flex-1 items-center justify-center gap-5 xl:gap-8 lg:flex">
           <NavItem to="/cars">Explore Cars</NavItem>
 
           {user && (
@@ -92,15 +125,15 @@ export default function Navbar() {
         </div>
 
         {/* Desktop Actions */}
-        <div className="hidden shrink-0 items-center gap-5 lg:flex">
+        <div className="hidden shrink-0 items-center gap-4 lg:flex">
           {user ? (
             <>
-              <div className="flex items-center gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-50 font-bold text-orange-500">
-                  {user.fullName.charAt(0).toUpperCase()}
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-50 font-bold text-orange-500">
+                  {userInitial}
                 </span>
 
-                <span className="max-w-[130px] truncate text-sm font-bold text-gray-700">
+                <span className="max-w-[110px] truncate text-sm font-bold text-gray-700 xl:max-w-[130px]">
                   {user.fullName}
                 </span>
               </div>
@@ -143,18 +176,20 @@ export default function Navbar() {
           }
           aria-expanded={menuOpen}
           aria-controls="mobile-navigation"
-          className="flex h-11 w-11 flex-col items-center justify-center gap-[5px] rounded-xl border border-gray-200 bg-white transition hover:border-orange-300 lg:hidden"
+          className="flex h-11 w-11 shrink-0 flex-col items-center justify-center gap-[5px] rounded-xl border border-gray-200 bg-white transition hover:border-orange-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 lg:hidden"
         >
           <span
             className={`h-0.5 w-5 rounded-full bg-gray-800 transition-all duration-200 ${
               menuOpen ? "translate-y-[7px] rotate-45" : ""
             }`}
           />
+
           <span
             className={`h-0.5 w-5 rounded-full bg-gray-800 transition-all duration-200 ${
-              menuOpen ? "opacity-0" : ""
+              menuOpen ? "scale-x-0 opacity-0" : ""
             }`}
           />
+
           <span
             className={`h-0.5 w-5 rounded-full bg-gray-800 transition-all duration-200 ${
               menuOpen ? "-translate-y-[7px] -rotate-45" : ""
@@ -166,10 +201,12 @@ export default function Navbar() {
       {/* Mobile Navigation */}
       <div
         id="mobile-navigation"
-        className={`overflow-hidden border-t border-gray-100 bg-white transition-all duration-300 lg:hidden ${
+        inert={!menuOpen}
+        aria-hidden={!menuOpen}
+        className={`overflow-hidden border-t border-gray-100 bg-white transition-[max-height,opacity] duration-300 ease-in-out lg:hidden ${
           menuOpen
-            ? "visible max-h-[550px] opacity-100"
-            : "invisible max-h-0 opacity-0"
+            ? "max-h-[600px] opacity-100"
+            : "pointer-events-none max-h-0 opacity-0"
         }`}
       >
         <div className="mx-auto flex max-w-[1440px] flex-col gap-1 px-5 py-5 sm:px-8">
@@ -198,14 +235,15 @@ export default function Navbar() {
               </NavItem>
 
               <div className="my-3 flex items-center gap-3 rounded-xl bg-gray-50 p-4">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100 font-bold text-orange-500">
-                  {user.fullName.charAt(0).toUpperCase()}
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100 font-bold text-orange-500">
+                  {userInitial}
                 </span>
 
                 <div className="min-w-0">
                   <p className="truncate text-sm font-bold text-gray-900">
                     {user.fullName}
                   </p>
+
                   <p className="text-xs text-gray-500">{user.role}</p>
                 </div>
               </div>
@@ -214,7 +252,7 @@ export default function Navbar() {
                 type="button"
                 onClick={handleLogout}
                 disabled={isLoggingOut}
-                className="w-full rounded-xl border border-red-100 bg-red-50 px-5 py-3 text-left text-sm font-bold text-red-600 transition hover:bg-red-100 disabled:opacity-50"
+                className="w-full rounded-xl border border-red-100 bg-red-50 px-5 py-3 text-left text-sm font-bold text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isLoggingOut ? "Logging out..." : "Log out"}
               </button>
